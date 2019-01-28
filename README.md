@@ -14,3 +14,21 @@ This approach works fine for small spatial regions, but begins to slow down when
 Info about bitmaps: https://en.wikipedia.org/wiki/Bit_array
 
 The previous approaches use EWAH compressed bitmaps. We can likely leverage the newer, better [Roaring Bitmaps](https://roaringbitmap.org) to already gain an advantage over the previous approach. We will also implement this project in C so it will be more lightweight than the Java-based implementation.
+
+When a particular grid cell gets hit with lots of storage requests, we will create a new, higher-resolution grid to represent that cell. To do this, we can use [Count Min](https://en.wikipedia.org/wiki/Count–min_sketch) or perhaps even better [HyperLogLog++](https://en.wikipedia.org/wiki/HyperLogLog).
+
+# Implementation
+
+The project implementation will be broken down into several tasks. See the following sections for details.
+
+## Task 1: Loading Data and Creating a Spatial Grid
+
+We can begin with the geohash dataset from the NOAA [North American Mesoscale Forecast System](https://www.ncdc.noaa.gov/data-access/model-data/model-datasets/north-american-mesoscale-forecast-system-nam). This has many points that overlap, since weather is recorded for particular areas across a grid. We will need to:
+
+* Convert geohashes to lat, lon points
+* Map lat, lon points to grid cells (x, y coordinates)
+* Map this grid to a bitmap
+
+## Task 2: Probabilistic Point Density Estimation
+
+Evaluate [Count Min](https://en.wikipedia.org/wiki/Count–min_sketch) and [HyperLogLog++](https://en.wikipedia.org/wiki/HyperLogLog) for estimating the amount of points stored in each grid cell.
