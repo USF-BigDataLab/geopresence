@@ -32,3 +32,6 @@ We can begin with the geohash dataset from the NOAA [North American Mesoscale Fo
 ## Task 2: Probabilistic Point Density Estimation
 
 Evaluate [Count Min](https://en.wikipedia.org/wiki/Count–min_sketch) and [HyperLogLog++](https://en.wikipedia.org/wiki/HyperLogLog) for estimating the amount of points stored in each grid cell.
+
+## Task 3: OpenStreetMap Data
+
