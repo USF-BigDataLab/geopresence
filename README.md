@@ -1,5 +1,7 @@
 # geopresence
 
+<img src="docs/geo.png" width="25%" align="right"/>
+
 The main idea behind this work is to create a geospatial index that runs on IoT/low-power devices. Location-based services, weather tracking, mapping, and GIS are all applicable domains. For a simplistic example, imagine air quality and weather monitoring devices placed on the streetlights in a city; rather than querying weather.com for the current weather in the Presidio or Mission District, why not just ask the streetlight across the street from the restaurant you're going to?
 
 Here is some previous work in this area:
