@@ -13,7 +13,7 @@
 		 can be used to determine whether or not data is 
 		 stored within a specified spatial region.
 
-    To compile: gcc -std=c11 -o geo -Wall -g geogrid.c   
+    To compile: gcc -std=c11 -o geo -Wall -g geogrid.c geohash.c   
 
     Please Note: Absolutely need to set the standard to c11, 
 	         the files that are included at the top
@@ -133,7 +133,7 @@ int xy_to_index(GeoCoord* gc) {
     Description: This function takes a given index from the bitmap
 		 and finds the coordinate that is at that index. 
 */
-GeoCoord* index_to_GeoCoord(int index) {
+GeoCoord* index_to_GeoCoord(int index){
     GeoCoord *new_geo = malloc(sizeof(new_geo)); 
     return new_geo;
 }
