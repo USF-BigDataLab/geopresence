@@ -44,11 +44,10 @@
 		 in order to configure it (i.e., get
 		 values, decode hash, etc.) 
 */
-GeoCoord* geo_coord_init(char* base_geo_hash, int precision) {
-    //See geohash.h and geohash.c for geohash_decode implementation
-    GeoCoord *base_range = malloc(sizeof(base_range)); 
+GeoCoord* geo_coord_init(GeoCoord* gc, char* base_geo_hash, int precision) {
+    //See geohash.h and geohash.c for geohash_decode implementation 
     GeoCoord gcs = geohash_decode(base_geo_hash);
-    base_range = &gcs; //gcs is being point to by base range 
+    gc = &gcs; //gcs is being point to by the struct passed into the function 
 
     /*
         height and width calculated by (mentioned in Java code):
@@ -76,9 +75,9 @@ GeoCoord* geo_coord_init(char* base_geo_hash, int precision) {
 	because the structs we're using declare these variables as
 	doubles. 
      */
-    double x_degrees = base_range->latitude;
-    double y_degrees = base_range->longitude; 
-    return base_range;
+    double x_degrees = gc->latitude;
+    double y_degrees = gc->longitude; 
+    return gc;
 }
 
 /*
@@ -180,7 +179,7 @@ void test_function(){
     GeoCoord *test = malloc(sizeof(test));
     //First argument comes from geohashes.txt file
     //Can't free this for some reason
-    test = geo_coord_init("8gpcxc4h3n", 2);
+    test = geo_coord_init(test, "8gpcxc4h3n", 2);
 
     //The latitude test works fine, but the xy_to_index
     //function just returns 0?
