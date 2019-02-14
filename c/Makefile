@@ -1,16 +1,6 @@
-# Simple Makefile for static library construction and testing
 
-all: library test
+common: common.c common.h geogrid.c geogrid.h geohash.h geohash.c roaring.c roaring.h
+	gcc -Wall -std=c11 common.c common.h geogrid.c geogrid.h geohash.h geohash.c roaring.c roaring.h -o geo
 
-library:
-	gcc -c geohash.c -o geohash.o
-	ar rcs libgeohash.a geohash.o
-	rm geohash.o
-	
-test:
-	gcc geohash_test.c geohash.c 	
-	./a.out
-	rm a.out
-	
 clean: 
-	rm -rf *.a *.o
+	rm -f geo

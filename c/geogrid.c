@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h> 
-#include "geohash.h"
-#include "roaring.h"
-#include "roaring.c"
+#include "geogrid.h"
+#include "common.h"
 
 /* 
     File: geogrid.c (originally named geoavailabilitygrid in java
@@ -189,17 +186,5 @@ void test_function(){
 
     //Why doesn't this function preserver the values in the struct?
     printf("Function test: %d\n", xy_to_index(test));
-}
-
-/*
-    Function: int main()
-    Input: None
-    Output: 0
-    Description: Main is used for calling the test 
-		 case functions. 
-*/
-int main() {
-    test_function();
-    return 0;
 }
 
