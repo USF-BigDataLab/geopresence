@@ -22,6 +22,7 @@
 struct rbitmap* init_rbitmap() {
     struct rbitmap* new_rbitmap = malloc(sizeof(struct rbitmap));
     new_rbitmap->gc = malloc(sizeof(GeoCoord*));
+    new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpcxc4h3n", 2);
     new_rbitmap->rbp = roaring_bitmap_create();
     return new_rbitmap; 
 }
