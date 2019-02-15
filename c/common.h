@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "geogrid.h"
 #include "roaring.h"
+#include "geohash.h"
 
 /*
     File common.h 
@@ -23,8 +24,10 @@
         2) roaring_bitmap_t *rbp - the roaring bitmap that we can use
            with the function in roaring.c 
 */
+
 struct rbitmap {
     GeoCoord *gc; //GeoCoord struct
     roaring_bitmap_t *rbp; //Roaring bit map
 };
+
 #endif

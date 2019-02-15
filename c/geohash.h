@@ -1,3 +1,5 @@
+#ifndef _GEOHASH_H_
+#define _GEOHASH_H_
 /*
  *  geohash.h
  *  libgeohash
@@ -76,3 +78,5 @@ extern char** geohash_neighbors(char* hash);
  * Returns the width and height of a precision value.
  */
 extern GeoBoxDimension geohash_dimensions_for_precision(int precision);
+
+#endif
