@@ -1,6 +1,4 @@
-#include "geogrid.h"
 #include "common.h"
-
 /* 
     File: geogrid.c (originally named geoavailabilitygrid in java
 	  implementation)

@@ -2,6 +2,7 @@
 #define _GEOGRID_H_
 #include "common.h"
 //See geogrid.c for function descriptions
+
 /*
 GeoCoord* geo_coord_init(GeoCoord* gc, char* base_geo_hash, int precision);
 bool addPoint(GeoCoord* gc);
