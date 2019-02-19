@@ -1,6 +1,19 @@
+CFLAGS += -Wall -std=c11
 
-common: common.c common.h geogrid.c geogrid.h geohash.h geohash.c roaring.c roaring.h
-	gcc -Wall -std=c11 common.c common.h geogrid.c geogrid.h geohash.h geohash.c roaring.c roaring.h -o geo
+src=driver.c bitmap.c common.c geogrid.c geohash.c roaring.c
+obj=$(src:.c=.o)
 
-clean: 
-	rm -f geo
+all: geo
+
+geo: $(obj)
+	$(CC) $(CFLAGS) $(obj) -o $@
+
+bitmap.o: bitmap.c bitmap.h
+common.o: common.c common.h
+geogrid.o: geogrid.c geogrid.h
+geohash.o: geohash.c geohash.h
+roaring.o: roaring.c roaring.h
+driver.o: driver.c
+
+clean:
+	rm -f geo $(obj)
