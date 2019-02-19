@@ -1,4 +1,4 @@
-#include "common.h"
+#include "./common.h"
 
 /*
     File: common.c
@@ -78,16 +78,4 @@ void test(){
     free_rbitmap(test);
     printf("Successfully freed bitmap\n");
     printf("**************************************************\n\n");
-}
-
-/*
-    Function: int main()
-    Input: None
-    Output: 0
-    Description: This main function will be used for testing
-		 and eventually used for the core logic of the program.
-*/
-int main() {
-    test();
-    return 0;
 }
