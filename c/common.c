@@ -22,8 +22,9 @@
 struct rbitmap* init_rbitmap() {
     struct rbitmap* new_rbitmap = malloc(sizeof(struct rbitmap));
     new_rbitmap->gc = malloc(sizeof(GeoCoord*));
-    new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpcxc4h3n", 2);
+    new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpguuck7u", 5);
     new_rbitmap->rbp = roaring_bitmap_create();
+    printf("Latitude: %lf    Longitude: %lf\n", new_rbitmap->gc->latitude, new_rbitmap->gc->longitude);
     return new_rbitmap;
 }
 
@@ -59,12 +60,9 @@ void init_rbitmap_from_file(char *file_path){
      Function: void test()
      Input: None
      Output: None
-     Description: This function is used for test cases.
+     Description: This function is used for testing initialization and freeing
 */
-void test(){
-    printf("TEST FUNCTION CALLED\n");
-    printf("**************************************************\n\n");
-
+void init_and_free_test() {
     printf("**************************************************\n");
     printf("Starting initialize bitmap test\n");
     printf("--------------------------------------------------\n");
@@ -78,4 +76,25 @@ void test(){
     free_rbitmap(test);
     printf("Successfully freed bitmap\n");
     printf("**************************************************\n\n");
+}
+
+/*
+    Function: void value_ptr_test()
+    Input: None
+    Output: None
+    Description: This function is used for testing values of the struct.
+*/
+void value_ptr_test(){
+    printf("**************************************************\n");
+    printf("Starting initialize bitmap test\n");
+    printf("--------------------------------------------------\n");
+    struct rbitmap* test = init_rbitmap();
+    printf("Sucessfully initialized bitmap\n");
+    printf("**************************************************\n\n");
+
+    printf("**************************************************\n");
+    printf("Accessing values in the bitmap\n");
+    printf("--------------------------------------------------\n");
+    printf("GeoCoord info: \n");
+    printf("Latitude: %lf    Longitude: %lf\n", test->gc->latitude, test->gc->longitude);
 }

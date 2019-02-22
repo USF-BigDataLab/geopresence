@@ -31,11 +31,9 @@ struct rbitmap {
 };
 
 struct rbitmap* init_rbitmap();
-
 void free_rbitmap(struct rbitmap* f_rbitmap);
-
 void init_rbitmap_from_file(char *file_path);
-
 void test();
+void value_ptr_test();
 
 #endif

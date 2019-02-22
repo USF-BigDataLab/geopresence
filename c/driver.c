@@ -8,8 +8,6 @@
  * Use as a playground to test out code.
  */
 int main(){
-
-
-
-  return 0;
+    value_ptr_test();
+    return 0;
 }
