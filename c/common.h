@@ -17,7 +17,7 @@
 /*
     Roaring bitmap struct
     Contains the folowing:
-        1) GeoCoord *gc - the GeoCoord struct that contains
+        1) GeoCoord gc - the GeoCoord struct that contains
                           x,y coordinates (north, east, south, west)
                           and height and width (see geohash.h)
 
@@ -26,7 +26,7 @@
 */
 
 struct rbitmap {
-    GeoCoord *gc; //GeoCoord struct
+    GeoCoord gc; //GeoCoord struct
     roaring_bitmap_t *rbp; //Roaring bit map
 };
 
