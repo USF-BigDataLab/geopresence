@@ -44,6 +44,7 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
     //So, GeoCoord is NOT a pointer because the geohash_decode function will return a 
     //GeoCoord struct; since gcs is NOT a pointer, memcpy will be called when assigning
     //the return value of geohash_decode to the struct gcs. 
+    //Keep in mind that latitude is x (or length) and longitude is y (or height)
     gc = geohash_decode(base_geo_hash);
 
     /*
@@ -55,11 +56,13 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
     int h = precision/2;
 
     if (precision % 2 != 0) {
-	h += 1;
+	    h += 1;
     }    
 
-    int width = (1 << w); /* = 2^w */
-    int height = (1 << h); /* = 2^h */
+    gc.width = (1 << w); /* = 2^w */
+    gc.height = (1 << h); /* = 2^h */
+
+    //Might need to add width and height to the GeoCoord struct
     
     /*
         In the Java code, this is a float, and it calculates an
@@ -72,8 +75,10 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
 	because the structs we're using declare these variables as
 	doubles. 
      */
-    double x_degrees = gc.latitude;
-    double y_degrees = gc.longitude; 
+    
+    //These variables are used for pixel calculations later (see Java implementation)
+    //double x_degrees = gc.latitude;
+    //double y_degrees = gc.longitude; 
     return gc;
 }
 

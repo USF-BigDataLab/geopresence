@@ -25,7 +25,8 @@ struct rbitmap* init_rbitmap() {
     //new_rbitmap->gc = malloc(sizeof(GeoCoord*));
     new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpguuck7u", 5);
     new_rbitmap->rbp = roaring_bitmap_create();
-    printf("Latitude: %lf    Longitude: %lf\n", new_rbitmap->gc.latitude, new_rbitmap->gc.longitude);
+    printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
+    new_rbitmap->gc.latitude, new_rbitmap->gc.longitude, new_rbitmap->gc.height, new_rbitmap->gc.width);
     return new_rbitmap;
 }
 
@@ -97,5 +98,7 @@ void value_ptr_test(){
     printf("Accessing values in the bitmap\n");
     printf("--------------------------------------------------\n");
     printf("GeoCoord info: \n");
-    printf("Latitude: %lf    Longitude: %lf\n", test->gc.latitude, test->gc.longitude);
+    printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
+    test->gc.latitude, test->gc.longitude, test->gc.height, test->gc.width);
+    printf("**************************************************\n");
 }
