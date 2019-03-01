@@ -59,8 +59,8 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
 	    h += 1;
     }    
 
-    gc.width = (1 << w); /* = 2^w */
-    gc.height = (1 << h); /* = 2^h */
+    gc.dimension.width = (1 << w); /* = 2^w */
+    gc.dimension.height = (1 << h); /* = 2^h */
 
     //Might need to add width and height to the GeoCoord struct
     
@@ -84,7 +84,8 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
 
 /*
     Function: bool addPoint() 
-    Input: int x, int y - Coordinate to be added
+    Input: struct rbitmap* bitmap - bitmap struct that will have a point
+    added to it.
     Output: bool
     Description: This function adds a new point to the
 		 geogrid; it looks like the Java version 
@@ -93,36 +94,50 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
 		 Coordinates are in latitude and longitude 
 		 according to the Java documentation.   
 */
-bool addPoint(GeoCoord* gc){
-    //How would we access the GeoBoxDimension dimension struct
-    //given that it's already inside a struct? 
-    if (gc->latitude < 0 || gc->longitude < 0) {
+bool addPoint(struct rbitmap* bitmap) {
+    int index = xy_to_index(bitmap->gc);
+    printf("Trying to insert at index: %d\n", index);
+
+    /*
+    if (bitmap->gc.latitude < 0 || bitmap->gc.longitude < 0) {
+
         return false;
-    } 
+    } */
 
     //if roaring bitmap index == false, then 
-    //add index to the pendingUpdates dats structure
+    //add index to the pendingUpdates data structure.
+    //In the Java code, this checks if the bit at the given
+    //index is set. However, in the CRoaring library, this 
+    //idea of checking a specific index does not exist (at least
+    //based on the documentation in the readme); that being said,
+    //we'll need to use the cardinality function to see how many bits are 
+    //are set in the map; if there are less bits than the index we want to set, then
+    //we can insert it.
+    uint32_t cardinality = roaring_bitmap_get_cardinality(bitmap->rbp);
+
+    //This means the index is NOT set because we have to insert data sequentially
+    if (cardinality < index) {
+        //Add to pending updates
+        //TODO: write data structure insertion functionality here
+        printf("Adding index: %d to the update queue\n", index); //for testing
+    } else {
+        printf("The index was NOT added to the update queue\n");
+    }
 
     return true; 
 }
 
 /*
-    Function: xy_to_index(GeoCoord* gc)
-    Input: GeoCoord* gc - the struct that the 
+    Function: xy_to_index(GeoCoord gc)
+    Input: GeoCoord gc - the struct that the 
 	   x and y coordinates will be retrieved
 	   from. 
     Output: int
     Description: This converts x and y coordinates to a 
 		 specific index within the bitmap. 
 */
-int xy_to_index(GeoCoord* gc) {
-    //Not sure if the roaring bitmap will have the same
-    //scheme as EWAH, but I'll leave this here for now.
-    printf("Latitude: %lf\n", gc->latitude);
-    printf("Width: %lf\n", gc->dimension.width);
-    printf("Longitude: %lf\n", gc->longitude);
-   
-    int index = (gc->latitude * gc->dimension.width) + gc->longitude;
+int xy_to_index(GeoCoord gc) {
+    int index = (gc.longitude * gc.dimension.width) + gc.latitude;
     return index;
 }
 

@@ -26,7 +26,7 @@ struct rbitmap* init_rbitmap() {
     new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpguuck7u", 5);
     new_rbitmap->rbp = roaring_bitmap_create();
     printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-    new_rbitmap->gc.latitude, new_rbitmap->gc.longitude, new_rbitmap->gc.height, new_rbitmap->gc.width);
+    new_rbitmap->gc.latitude, new_rbitmap->gc.longitude, new_rbitmap->gc.dimension.height, new_rbitmap->gc.dimension.width);
     return new_rbitmap;
 }
 
@@ -99,6 +99,27 @@ void value_ptr_test(){
     printf("--------------------------------------------------\n");
     printf("GeoCoord info: \n");
     printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-    test->gc.latitude, test->gc.longitude, test->gc.height, test->gc.width);
+    test->gc.latitude, test->gc.longitude, test->gc.dimension.height, test->gc.dimension.width);
     printf("**************************************************\n");
+}
+
+/*
+    Function: void coord_insertion_test()
+    Input: None
+    Output: None
+    Description: This function is used for testing the insertion function specified in
+    geogrid.c 
+*/
+void coord_insertion_test(){
+    printf("**************************************************\n");
+    printf("Starting initialize bitmap test\n");
+    printf("--------------------------------------------------\n");
+    struct rbitmap* test = init_rbitmap();
+    printf("Sucessfully initialized bitmap\n");
+    printf("**************************************************\n\n");
+
+    printf("**************************************************\n");
+    printf("Testing addPoint function\n");
+    printf("--------------------------------------------------\n");
+    addPoint(test);
 }

@@ -36,5 +36,7 @@ void free_rbitmap(struct rbitmap* f_rbitmap);
 void init_rbitmap_from_file(char *file_path);
 void test();
 void value_ptr_test();
+void coord_insertion_test();
+bool addPoint(struct rbitmap* bitmap);
 
 #endif

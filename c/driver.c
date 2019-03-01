@@ -8,6 +8,6 @@
  * Use as a playground to test out code.
  */
 int main(){
-    value_ptr_test();
+    coord_insertion_test();
     return 0;
 }
