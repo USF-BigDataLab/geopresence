@@ -14,6 +14,5 @@ int xy_to_index(GeoCoord gc);
 GeoCoord* index_to_GeoCoord(int index);
 GeoCoord* xy_to_GeoCoord(int x, int y);
 void apply_updates();
-void test_function();
 */
 #endif

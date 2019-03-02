@@ -44,6 +44,7 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
     //So, GeoCoord is NOT a pointer because the geohash_decode function will return a 
     //GeoCoord struct; since gcs is NOT a pointer, memcpy will be called when assigning
     //the return value of geohash_decode to the struct gcs. 
+
     //Keep in mind that latitude is x (or length) and longitude is y (or height)
     gc = geohash_decode(base_geo_hash);
 
@@ -142,32 +143,42 @@ int xy_to_index(GeoCoord gc) {
 }
 
 /*
-    Function: GeoCoord* index_to_GeoCoord(int index) 
+    Function: GeoCoord index_to_GeoCoord(int index) 
     Input: int index - the index that correspond to a coordinate
-    Output: GeoCoord *new_geo - a GeoCoord struct that contains the 
+    Output: GeoCoord new_geo - a GeoCoord struct that contains the 
 	    coordinate found at the index given to the function.	    
     Description: This function takes a given index from the bitmap
-		 and finds the coordinate that is at that index. 
+		 and finds the coordinate that is at that index. This is called
+         index_to_xy in the Java implementation, but it's called index_to_GeoCoord
+         in the C version since the Point object doesn't exist in C. 
 */
-GeoCoord* index_to_GeoCoord(int index){
-    GeoCoord *new_geo = malloc(sizeof(new_geo)); 
+GeoCoord index_to_GeoCoord(int index, GeoCoord orig_coord) {
+    GeoCoord new_geo = orig_coord;
+    new_geo.latitude = index % (int) (orig_coord.longitude); //has to be an int for modulus operator
+    new_geo.longitude = index / orig_coord.longitude;
     return new_geo;
 }
 
 /*
-    Function: GeoCoord* xy_to_spatialrange(int x, int y) 
+    Function: GeoCoord xy_to_spatialrange(int x, int y) 
     Input: int x - x coordinate
 	   int y - y coordinate
-    Output: GeoCoord* - the new GeoCoord struct that has the new
+    Output: GeoCoord - the new GeoCoord struct that has the new
 			x and y coordinates. 
     Description: this function converts x and y coordinates
 	         into a GeoCoord struct and returns the new
 		 struct.
 		 ***This function was called xy_to_spatial_range
 		    on the architecture pdf*** 
+
+    NOTICE: Not completely sure how we implement this at the moment given
+            that the Java implementation gets lowerbounds for both longitude
+            and latitude. Also, the Java implementation uses degrees per pixel
+            variables, which haven't been implemented here yet since we mentioned
+            that we won't focus on anything involving actually graphing the data
 */
-GeoCoord* xy_to_GeoCoord(int x, int y){
-    GeoCoord *new_geo = malloc(sizeof(new_geo));
+GeoCoord xy_to_GeoCoord(int x, int y) {
+    GeoCoord new_geo = {0};
     return new_geo;    
 }
 
@@ -176,35 +187,61 @@ GeoCoord* xy_to_GeoCoord(int x, int y){
     Input: void
     Output: void
     Description: This will apply our updates to the 
-		 bitmap.  
+    bitmap.  
 */
 void apply_updates(){
 
 }
 
-/*
-    Function: void test_function()
-    Input: void
-    Output: void
-    Description: This function is for test cases so that 
-		 main doesn't get filled with them.  
-*/
-void test_function(){
-    printf("Hello! Test cases go here\n");
-    printf("Initializing a new GeoCoord struct\n");
+//NOTICE:
+//Can indices be negative? This raises some questions. I presume they can't be, but 
+//perhaps there's a reason; the test function returns a negative index and it's because
+//the calculation uses latitude and longitude, which can be negative.  
+void xy_to_index_test() {
+    printf("**************************************************\n");
+    printf("Starting initialize bitmap test\n");
+    printf("--------------------------------------------------\n");
+    struct rbitmap* test = init_rbitmap();
+    printf("Sucessfully initialized bitmap\n");
+    printf("**************************************************\n\n");
 
-    //GeoCoord test;
-    //First argument comes from geohashes.txt file
-    //Can't free this for some reason
-    //test = geo_coord_init(test, "8gpcxc4h3n", 2);
+    printf("**************************************************\n");
+    printf("Testing xy_to_index function\n");
+    printf("--------------------------------------------------\n");
 
-    //The latitude test works fine, but the xy_to_index
-    //function just returns 0?
-    //printf("Latitude: %lf\n", test.latitude);
-    //printf("Width: %lf\n", test->dimension.width);
-    //printf("Longitude: %lf\n\n", test.longitude);
+    int t = xy_to_index(test->gc);
 
-    //Why doesn't this function preserver the values in the struct?
-    //printf("Function test: %d\n", xy_to_index(test));
+    printf("Here is the index: %d\n", t);
+    printf("**************************************************\n");
 }
 
+void index_to_geo_test(){
+    printf("**************************************************\n");
+    printf("Starting initialize bitmap test\n");
+    printf("--------------------------------------------------\n");
+    struct rbitmap* test = init_rbitmap();
+    printf("Sucessfully initialized bitmap\n");
+    printf("**************************************************\n\n");
+
+    printf("**************************************************\n");
+    printf("Testing index_to_GeoCoord function\n");
+    printf("--------------------------------------------------\n");
+
+    printf("**************************************************\n");
+    printf("Getting values before function call\n");
+    printf("--------------------------------------------------\n");
+    printf("GeoCoord info: \n");
+    printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
+    test->gc.latitude, test->gc.longitude, test->gc.dimension.height, test->gc.dimension.width);
+    printf("**************************************************\n");
+
+    test->gc = index_to_GeoCoord(1, test->gc);
+
+    printf("**************************************************\n");
+    printf("Getting values after the function call\n");
+    printf("--------------------------------------------------\n");
+    printf("GeoCoord info: \n");
+    printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
+    test->gc.latitude, test->gc.longitude, test->gc.dimension.height, test->gc.dimension.width);
+    printf("**************************************************\n");
+}

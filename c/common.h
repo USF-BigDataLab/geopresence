@@ -38,5 +38,7 @@ void test();
 void value_ptr_test();
 void coord_insertion_test();
 bool addPoint(struct rbitmap* bitmap);
-
+GeoCoord index_to_GeoCoord(int index, GeoCoord orig_coord);
+void index_to_geo_test();
+void xy_to_index_test();
 #endif

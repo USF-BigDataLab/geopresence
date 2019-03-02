@@ -7,7 +7,8 @@
 /*
  * Use as a playground to test out code.
  */
-int main(){
-    coord_insertion_test();
+int main() {
+    //index_to_geo_test();
+    //xy_to_index_test();
     return 0;
 }
