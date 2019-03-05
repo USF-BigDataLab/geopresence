@@ -43,7 +43,7 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
     free(f_rbitmap);
 }
 
-void init_rbitmap_from_file(char *file_path){
+void geocoord_add_from_file(GeoCoord gc, char *file_path){
   // can test w/ "../datasets/geohashes.txt"
 
   FILE *fp;
@@ -51,7 +51,7 @@ void init_rbitmap_from_file(char *file_path){
 
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
-    /* TODO: Populate bitmap */
+    /* TODO: Populate geocord */
     // printf("%s", buff);
   }
 

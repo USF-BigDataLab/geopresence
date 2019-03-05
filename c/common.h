@@ -33,7 +33,7 @@ struct rbitmap {
 
 struct rbitmap* init_rbitmap();
 void free_rbitmap(struct rbitmap* f_rbitmap);
-void init_rbitmap_from_file(char *file_path);
+void geocoord_add_from_file(GeoCoord gc, char *file_path);
 void test();
 void value_ptr_test();
 void coord_insertion_test();
