@@ -54,10 +54,11 @@ void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
     // printf("%s", buff);
 
     bmp->gc = geo_coord_init(bmp->gc, buff, precision);
-    // print_gc(bmp->gc);
+    print_gc(bmp->gc);
 
     // TODO: Check bool if added?
-    addPoint(bmp);
+    roaring_bitmap_add(bmp->rbp, xy_to_index(bmp->gc));
+    printf("Cardinality = %llu \n", roaring_bitmap_get_cardinality(bmp->rbp));
   }
 
   fclose(fp);
