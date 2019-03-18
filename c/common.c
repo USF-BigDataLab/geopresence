@@ -10,9 +10,9 @@
 		 for running the program.
 */
 
-void print_gc(struct rbitmap *bitmap){
+void print_gc(GeoCoord gc){
   printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-  bitmap->gc.latitude, bitmap->gc.longitude, bitmap->gc.dimension.height, bitmap->gc.dimension.width);
+  gc.latitude, gc.longitude, gc.dimension.height, gc.dimension.width);
 }
 
 /*
@@ -26,15 +26,12 @@ void print_gc(struct rbitmap *bitmap){
 */
 struct rbitmap* init_rbitmap() {
     struct rbitmap* new_rbitmap = malloc(sizeof(struct rbitmap));
-    //struct rbitmap new_rbitmap;
-    //new_rbitmap->gc = malloc(sizeof(GeoCoord*));
-    new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpguuck7u", 5);
     new_rbitmap->rbp = roaring_bitmap_create();
 
-    print_gc(new_rbitmap);
+    //new_rbitmap->gc = malloc(sizeof(GeoCoord*));
+    // new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpguuck7u", 5);
+    // print_gc(new_rbitmap);
 
-    // printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-    // new_rbitmap->gc.latitude, new_rbitmap->gc.longitude, new_rbitmap->gc.dimension.height, new_rbitmap->gc.dimension.width);
     return new_rbitmap;
 }
 
@@ -60,24 +57,10 @@ void rbitmap_add_all(struct rbitmap *bitmap, char *file_path, int precision){
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
 
-    geo_coord_init(bitmap->gc, buff, precision);
+    bitmap->gc = geo_coord_init(bitmap->gc, buff, precision);
+    // print_gc(bitmap);
 
     /* TODO: Populate bitmap */
-    // printf("%s", buff);
-  }
-
-  fclose(fp);
-}
-
-void geocoord_add_from_file(GeoCoord gc, char *file_path, int precision){
-  // can test w/ "../datasets/geohashes.txt"
-
-  FILE *fp;
-  char buff[255];
-
-  fp = fopen(file_path, "r");
-  while(fgets(buff, 255, (FILE*) fp)){
-    /* TODO: Populate geocord */
     // printf("%s", buff);
   }
 
