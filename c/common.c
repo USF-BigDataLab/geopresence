@@ -10,6 +10,11 @@
 		 for running the program.
 */
 
+void print_gc(struct rbitmap *bitmap){
+  printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
+  bitmap->gc.latitude, bitmap->gc.longitude, bitmap->gc.dimension.height, bitmap->gc.dimension.width);
+}
+
 /*
     Function: struct rbitmap* init_rbitmap()
     Input: None
@@ -25,8 +30,11 @@ struct rbitmap* init_rbitmap() {
     //new_rbitmap->gc = malloc(sizeof(GeoCoord*));
     new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "8gpguuck7u", 5);
     new_rbitmap->rbp = roaring_bitmap_create();
-    printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-    new_rbitmap->gc.latitude, new_rbitmap->gc.longitude, new_rbitmap->gc.dimension.height, new_rbitmap->gc.dimension.width);
+
+    print_gc(new_rbitmap);
+
+    // printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
+    // new_rbitmap->gc.latitude, new_rbitmap->gc.longitude, new_rbitmap->gc.dimension.height, new_rbitmap->gc.dimension.width);
     return new_rbitmap;
 }
 
@@ -43,7 +51,25 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
     free(f_rbitmap);
 }
 
-void geocoord_add_from_file(GeoCoord gc, char *file_path){
+void rbitmap_add_all(struct rbitmap *bitmap, char *file_path, int precision){
+  // can test w/ "../datasets/geohashes.txt"
+
+  FILE *fp;
+  char buff[255];
+
+  fp = fopen(file_path, "r");
+  while(fgets(buff, 255, (FILE*) fp)){
+
+    geo_coord_init(bitmap->gc, buff, precision);
+
+    /* TODO: Populate bitmap */
+    // printf("%s", buff);
+  }
+
+  fclose(fp);
+}
+
+void geocoord_add_from_file(GeoCoord gc, char *file_path, int precision){
   // can test w/ "../datasets/geohashes.txt"
 
   FILE *fp;
@@ -108,7 +134,7 @@ void value_ptr_test(){
     Input: None
     Output: None
     Description: This function is used for testing the insertion function specified in
-    geogrid.c 
+    geogrid.c
 */
 void coord_insertion_test(){
     printf("**************************************************\n");
