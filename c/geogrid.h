@@ -7,6 +7,7 @@
 
 //See geogrid.c for function descriptions
 
+void print_gc(GeoCoord gc);
 GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision);
 //bool addPoint(struct rbitmap* bitmap);
 int xy_to_index(GeoCoord gc);

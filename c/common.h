@@ -31,7 +31,6 @@ struct rbitmap {
     roaring_bitmap_t *rbp; //Roaring bit map
 };
 
-void print_gc(GeoCoord gc);
 struct rbitmap* init_rbitmap();
 void free_rbitmap(struct rbitmap* f_rbitmap);
 void rbitmap_add_all(struct rbitmap *bitmap, char *file_path, int precision);

@@ -10,11 +10,6 @@
 		 for running the program.
 */
 
-void print_gc(GeoCoord gc){
-  printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-  gc.latitude, gc.longitude, gc.dimension.height, gc.dimension.width);
-}
-
 /*
     Function: struct rbitmap* init_rbitmap()
     Input: None
