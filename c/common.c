@@ -48,7 +48,7 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
     free(f_rbitmap);
 }
 
-void rbitmap_add_all(struct rbitmap *bitmap, char *file_path, int precision){
+void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
   // can test w/ "../datasets/geohashes.txt"
 
   FILE *fp;
@@ -56,12 +56,13 @@ void rbitmap_add_all(struct rbitmap *bitmap, char *file_path, int precision){
 
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
-
-    bitmap->gc = geo_coord_init(bitmap->gc, buff, precision);
-    // print_gc(bitmap);
-
-    /* TODO: Populate bitmap */
     // printf("%s", buff);
+
+    bmp->gc = geo_coord_init(bmp->gc, buff, precision);
+    // print_gc(bmp->gc);
+
+    // TODO: Check bool if added?
+    addPoint(bmp);
   }
 
   fclose(fp);
