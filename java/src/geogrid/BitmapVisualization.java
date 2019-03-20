@@ -1,4 +1,4 @@
-/*
+package geogrid;/*
 Copyright (c) 2013, Colorado State University
 All rights reserved.
 
@@ -22,8 +22,6 @@ any theory of liability, whether in contract, strict liability, or tort
 (including negligence or otherwise) arising in any way out of the use of this
 software, even if advised of the possibility of such damage.
 */
-
-package edu.colostate.cs.galileo.bmp;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

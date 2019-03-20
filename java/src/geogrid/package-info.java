@@ -26,4 +26,3 @@ software, even if advised of the possibility of such damage.
 /**
  * Bitmap indexing functionality.
  */
-package edu.colostate.cs.galileo.bmp;

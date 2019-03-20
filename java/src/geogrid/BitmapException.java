@@ -1,4 +1,4 @@
-/*
+package geogrid;/*
 Copyright (c) 2014, Colorado State University
 All rights reserved.
 
@@ -23,27 +23,26 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package edu.colostate.cs.galileo.bmp;
+public class BitmapException extends Exception {
 
-import java.util.List;
+    private static final long serialVersionUID = -4516532285359101020L;
 
-import edu.colostate.cs.galileo.dataset.Coordinates;
+    private int bit;
 
-/**
- * Encapsulates a GeoavailabilityGrid query: a list of a coordinates that form
- * a polygon of interest that will be intersected with the grid points.
- *
- * @author malensek
- */
-public class GeoavailabilityQuery {
-
-    private List<Coordinates> polygon;
-
-    public GeoavailabilityQuery(List<Coordinates> polygon) {
-        this.polygon = polygon;
+    public BitmapException() {
+        super();
     }
 
-    public List<Coordinates> getPolygon() {
-        return polygon;
+    public BitmapException(String s) {
+        super(s);
+    }
+
+    public BitmapException(String s, int bit) {
+        super(s);
+        this.bit = bit;
+    }
+
+    public int getBit() {
+        return bit;
     }
 }

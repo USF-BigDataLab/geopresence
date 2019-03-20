@@ -1,4 +1,4 @@
-/*
+package geogrid;/*
 Copyright (c) 2014, Colorado State University
 All rights reserved.
 
@@ -23,17 +23,10 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package edu.colostate.cs.galileo.bmp;
-
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import edu.colostate.cs.galileo.dataset.Coordinates;
-import edu.colostate.cs.galileo.dataset.Point;
-import edu.colostate.cs.galileo.dataset.SpatialRange;
-import edu.colostate.cs.galileo.util.Geohash;
 
 /**
  * Implements a bitmap-based spatial index that can be used to determine

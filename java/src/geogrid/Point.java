@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Colorado State University
+Copyright (c) 2013, Colorado State University
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -23,28 +23,74 @@ any theory of liability, whether in contract, strict liability, or tort
 software, even if advised of the possibility of such damage.
 */
 
-package edu.colostate.cs.galileo.bmp;
+package geogrid;
 
-public class BitmapException extends Exception {
+/**
+ * Generic class for representing points in 2D or 3D space.
+ *
+ * @author malensek
+ */
+public class Point<T> {
 
-    private static final long serialVersionUID = -4516532285359101020L;
+    private T x;
+    private T y;
+    private T z;
 
-    private int bit;
+    private boolean hasZ;
 
-    public BitmapException() {
-        super();
+    /**
+     * Constructs a 2D point.
+     *
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     */
+    public Point(T x, T y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public BitmapException(String s) {
-        super(s);
+    /**
+     * Constructs a 3D point.
+     *
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     * @param z Z-coordinate
+     */
+    public Point(T x, T y, T z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        hasZ = true;
     }
 
-    public BitmapException(String s, int bit) {
-        super(s);
-        this.bit = bit;
+    /**
+     * Reports whether this Point has a third (Z) dimension.
+     *
+     * @return true if a third dimension is available.
+     */
+    public boolean hasZ() {
+        return hasZ;
     }
 
-    public int getBit() {
-        return bit;
+    public T X() {
+        return x;
+    }
+
+    public T Y() {
+        return y;
+    }
+
+    public T Z() {
+        return z;
+    }
+
+    @Override
+    public String toString() {
+        if (hasZ()) {
+            return "(" + x + ", " + y + ", " + z + ")";
+        } else {
+            return "(" + x + ", " + y + ")";
+        }
     }
 }
