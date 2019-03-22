@@ -48,17 +48,17 @@ void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
 
   FILE *fp;
   char buff[255];
+  GeoCoord temp_gc;
 
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
     // printf("%s", buff);
 
-    bmp->gc = geo_coord_init(bmp->gc, buff, precision);
-    print_gc(bmp->gc);
+    temp_gc = hash_to_geo(buff, precision);
+    int index = xy_to_index(temp_gc);
 
-    // TODO: Check bool if added?
-    roaring_bitmap_add(bmp->rbp, xy_to_index(bmp->gc));
-    printf("Cardinality = %llu \n", roaring_bitmap_get_cardinality(bmp->rbp));
+    roaring_bitmap_add(bmp->rbp, index);
+    // printf("Cardinality = %llu \n", roaring_bitmap_get_cardinality(bmp->rbp));
   }
 
   fclose(fp);

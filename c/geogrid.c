@@ -90,6 +90,32 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision) {
 }
 
 /*
+    Function: hash_to_geo
+    Creates a GeoCoord from a hash and precision
+    Input:
+      - baseGeohash: the geo hash to be converted to GeoCoord struct
+      - precision: used for the calculation of height and width
+
+    Returns: A GeoCoord created from the hash and precision
+*/
+GeoCoord hash_to_geo(char* base_geo_hash, int precision){
+
+  GeoCoord gc = geohash_decode(base_geo_hash);
+
+  int w = precision/2;
+  int h = precision/2;
+
+  if (precision % 2 != 0) {
+    h += 1;
+  }
+
+  gc.dimension.width = (1 << w); /* = 2^w */
+  gc.dimension.height = (1 << h); /* = 2^h */
+
+  return gc;
+}
+
+/*
     Function: bool addPoint()
     Input: struct rbitmap* bitmap - bitmap struct that will have a point
     added to it.
