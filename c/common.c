@@ -43,6 +43,15 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
     free(f_rbitmap);
 }
 
+/*
+    Function: rbitmap_add_all
+    Populates bitmap from geohashes converted into indexes from a file.
+    Input:
+      - bmp: rbitmap to populate
+      - file_path: txt file with geohashes
+      - precision: Used by GeoCoord to calculate heigh and width
+    Returns: Void
+*/
 void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
   // can test w/ "../datasets/geohashes.txt"
 
@@ -63,6 +72,7 @@ void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
 
   fclose(fp);
 }
+
 
 /*
      Function: void test()
