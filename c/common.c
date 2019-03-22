@@ -73,6 +73,48 @@ void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
   fclose(fp);
 }
 
+/*
+    Function: rbitmap_add_all_buff
+    Populates bitmap from geohashes converted into indexes from a file while
+    using an index buffer to use Roarings add_many function which claims to
+    be faster.
+    Input:
+      - bmp: rbitmap to populate
+      - file_path: txt file with geohashes
+      - precision: Used by GeoCoord to calculate heigh and width
+    Returns: Void
+*/
+void rbitmap_add_all_buff(struct rbitmap *bmp, char *file_path, int precision){
+  FILE *fp;
+  char buff[255];
+  const int indexes_size = 1000;
+  int indexes[indexes_size], i = 0; //index buffer
+  GeoCoord temp_gc;
+
+  fp = fopen(file_path, "r");
+  while(fgets(buff, 255, (FILE*) fp)){
+    // printf("%s", buff);
+
+    temp_gc = hash_to_geo(buff, precision);
+    int index = xy_to_index(temp_gc);
+    indexes[i++] = index;
+
+    if(i >= indexes_size-1){
+      roaring_bitmap_add_many(bmp->rbp, indexes_size, &indexes);
+      i = 0; //reset
+    }
+
+    // printf("Cardinality = %llu \n", roaring_bitmap_get_cardinality(bmp->rbp));
+  }
+
+  if(i > 0) //add any leftover indexes
+    roaring_bitmap_add_many(bmp->rbp, i, &indexes);
+
+  // printf("Cardinality = %llu \n", roaring_bitmap_get_cardinality(bmp->rbp));
+
+  fclose(fp);
+}
+
 
 /*
      Function: void test()

@@ -34,6 +34,7 @@ struct rbitmap {
 struct rbitmap* init_rbitmap();
 void free_rbitmap(struct rbitmap* f_rbitmap);
 void rbitmap_add_all(struct rbitmap *bitmap, char *file_path, int precision);
+void rbitmap_add_all_buff(struct rbitmap *bmp, char *file_path, int precision);
 void test();
 void value_ptr_test();
 void coord_insertion_test();
