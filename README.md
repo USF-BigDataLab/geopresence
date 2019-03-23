@@ -29,6 +29,15 @@ We can begin with the geohash dataset from the NOAA [North American Mesoscale Fo
 * Map lat, lon points to grid cells (x, y coordinates)
 * Map this grid to a bitmap
 
+The original Java implementation uses a 'base geohash' to determine the spatial range of the geogrid bitmap. This is a large, low-resolution area (e.g., `9x`) that helps conversion to x,y coordinates.
+
+### Benchmarks
+
+Since we're targeting IoT deployments, we will test on a Raspberry Pi.
+
+* Loading data: what is the speed difference in loading the data between the C and Java versions? We should load the data twice, one to initially populate the bitmap, and again to test reinsertion (in the 2nd pass, no new data should be added). 
+* Varying insertion sizes: the Java implementation stores incoming points in a sorted map and then inserts them before servicing a query. This helps avoid issues with out-of-order insertions with EWAH. However, Roaring Bitmaps have no such limitation so we can insert a single point at a time or several. For this benchmark, we will vary the insertion size and measure speed (it is likely faster to insert many points at once, but there should be a point of diminishing returns)
+
 ## Task 2: Probabilistic Point Density Estimation
 
 Evaluate [Count Min](https://en.wikipedia.org/wiki/Count–min_sketch) and [HyperLogLog++](https://en.wikipedia.org/wiki/HyperLogLog) for estimating the amount of points stored in each grid cell.
