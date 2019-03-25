@@ -10,5 +10,6 @@
 int main() {
     //index_to_geo_test();
     //xy_to_index_test();
+    insertion_benchmark();
     return 0;
 }

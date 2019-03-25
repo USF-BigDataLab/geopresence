@@ -191,19 +191,22 @@ void coord_insertion_test(){
   bitmap. 
 */
 void insertion_benchmark() {
-    printf("STARTING INSERTION BENCHMARK");
+    printf("STARTING INSERTION BENCHMARK\n");
     clock_t start, end;
     double time_taken;
     start = clock();
 
     struct rbitmap* test = init_rbitmap();
-    rbitmap_add_all_buff(test, "geohashes.txt", 12);
+    char* filename;
+    filename = "geohashes.txt";
+    rbitmap_add_all_buff(test, filename, 12);
 
     // Custom iterator that the developers of CRoaring created
     int counter = 0;
     roaring_uint32_iterator_t * i = roaring_create_iterator(test->rbp);
 
     while (i->has_value) {
+      printf("current value: %d\n", i->current_value); // Printing value at the given index
       counter++;
       roaring_advance_uint32_iterator(i);
     }
@@ -212,5 +215,5 @@ void insertion_benchmark() {
 
     end = clock();
     time_taken = ((double) (end - start) / CLOCKS_PER_SEC);
-    printf("Total time (seconds): %f", time_taken);
+    printf("Total time (seconds): %f\n", time_taken);
 }
