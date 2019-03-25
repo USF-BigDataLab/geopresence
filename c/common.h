@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "geogrid.h"
 #include "roaring.h"
 #include "geohash.h"

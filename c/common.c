@@ -1,5 +1,5 @@
 #include "./common.h"
-
+#define INDEXES_SIZE 1000
 /*
     File: common.c
     Description: This file contains the struct that needs to be
@@ -87,8 +87,9 @@ void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
 void rbitmap_add_all_buff(struct rbitmap *bmp, char *file_path, int precision){
   FILE *fp;
   char buff[255];
-  const int indexes_size = 1000;
-  int indexes[indexes_size], i = 0; //index buffer
+  //const int indexes_size = 1000;
+  int indexes[INDEXES_SIZE];
+  int i = 0; //index buffer
   GeoCoord temp_gc;
 
   fp = fopen(file_path, "r");
@@ -99,8 +100,8 @@ void rbitmap_add_all_buff(struct rbitmap *bmp, char *file_path, int precision){
     int index = xy_to_index(temp_gc);
     indexes[i++] = index;
 
-    if(i >= indexes_size-1){
-      roaring_bitmap_add_many(bmp->rbp, indexes_size, &indexes);
+    if(i >= INDEXES_SIZE-1){
+      roaring_bitmap_add_many(bmp->rbp, INDEXES_SIZE, &indexes);
       i = 0; //reset
     }
 
@@ -114,7 +115,6 @@ void rbitmap_add_all_buff(struct rbitmap *bmp, char *file_path, int precision){
 
   fclose(fp);
 }
-
 
 /*
      Function: void test()
@@ -180,4 +180,37 @@ void coord_insertion_test(){
     printf("Testing addPoint function\n");
     printf("--------------------------------------------------\n");
     addPoint(test);
+}
+
+/*
+  Function: void insertion_benchmark()
+  Input: None
+  Output: None
+  Description: This function is used specifcally for benchmarking; this will
+  allow us to see the time performance of inserting points into the roaring
+  bitmap. 
+*/
+void insertion_benchmark() {
+    printf("STARTING INSERTION BENCHMARK");
+    clock_t start, end;
+    double time_taken;
+    start = clock();
+
+    struct rbitmap* test = init_rbitmap();
+    rbitmap_add_all_buff(test, "geohashes.txt", 12);
+
+    // Custom iterator that the developers of CRoaring created
+    int counter = 0;
+    roaring_uint32_iterator_t * i = roaring_create_iterator(test->rbp);
+
+    while (i->has_value) {
+      counter++;
+      roaring_advance_uint32_iterator(i);
+    }
+
+    roaring_free_uint32_iterator(i); // Free the iterator
+
+    end = clock();
+    time_taken = ((double) (end - start) / CLOCKS_PER_SEC);
+    printf("Total time (seconds): %f", time_taken);
 }
