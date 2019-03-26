@@ -9,12 +9,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/*
+    Class: GeoavailabilityGridTest
+    Purpose: This class contains all of our JUnit tests for
+    benchmarking different aspects of our bitmap. Currently,
+    we are trying to measure the time it takes to load
+    data into the bitmap.
+ */
 public class GeoavailabilityGridTest {
     int dataCounter = 0; // Used for keeping track of insertions for a single iteration through the data set
     int dataSize = 500; // maximum amount of data that should be read from the data set
     int iterations = 0; // current number of iterations through the data set
     int iterationSize = 500; // number of times the data set should be iterated through
 
+    /*
+        Function: public void readFileTest()
+        Purpose: This function is used to read in data from a specified file.
+        This function also uses the variables defined at the top of this class
+        to determine how much data should be read in from the file. Additionally,
+        we iterate over the file n times with n being the value that the variable
+        iterationSize is set to (see variables at the top of the class).
+
+        Additionally, this function uses the nanoTime() system call so that
+        we can print the total time needed to load the data. nanoseconds, milliseconds,
+        and seconds to the console; depending on data set size, one time measure might be
+        more insightful than others.
+     */
     @org.junit.Test
     public void readFileTest() {
 
@@ -65,6 +85,12 @@ public class GeoavailabilityGridTest {
         System.out.println("Time elapsed (seconds): " + totalTimeSeconds);
     }
 
+    /*
+        Function: public void addPoint()
+        Purpose: This function adds a single point into the bitmap; it's just a
+        very simple test that helps understand the process for inserting values
+        into the bitmap.
+     */
     @org.junit.Test
     public void addPoint() {
         long startTime = System.nanoTime();
@@ -83,6 +109,12 @@ public class GeoavailabilityGridTest {
         System.out.println("Time elapsed (seconds): " + totalTimeSeconds);
     }
 
+    /*
+        Function: public void addPoints()
+        Purpose: This is a simple function that just reads in three points. It's
+        another simple test to demonstrate the process for inserting values into
+        the bitmap.
+     */
     @org.junit.Test
     public void addPoints() {
         long startTime = System.nanoTime();
