@@ -10,38 +10,48 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class GeoavailabilityGridTest {
-    private Map<String, GeoavailabilityGrid> grids = new HashMap<>();
+    int dataCounter = 0; // Used for keeping track of insertions for a single iteration through the data set
+    int dataSize = 500; // maximum amount of data that should be read from the data set
+    int iterations = 0; // current number of iterations through the data set
+    int iterationSize = 500; // number of times the data set should be iterated through
 
     @org.junit.Test
     public void readFileTest() {
+
         long startTime = System.nanoTime();
 
         try {
-            String filename = "geohashes.txt"; // Put file name here
-            BufferedReader br = new BufferedReader(new FileReader(filename));
-            String line = br.readLine();
-            while (line != null) {
-                /* Get the first character in the string. We'll create a GeoGrid for
-                 * each unique character to split things up. */
-                String prefix = line.substring(0, 1);
-                GeoavailabilityGrid gg = grids.get(prefix);
-                if (gg == null) {
-                    grids.put(
-                            prefix,
-                            new GeoavailabilityGrid(prefix, 10)
-                    );
-                    gg = grids.get(prefix);
+            while (iterations < iterationSize) {
+                Map<String, GeoavailabilityGrid> grids = new HashMap<>();
+                String filename = "geohashes.txt"; // Put file name here
+                BufferedReader br = new BufferedReader(new FileReader(filename));
+                String line = br.readLine();
+                dataCounter = 0;
+                while (line != null && dataCounter < dataSize) {
+                    /* Get the first character in the string. We'll create a GeoGrid for
+                     * each unique character to split things up. */
+                    String prefix = line.substring(0, 1);
+                    GeoavailabilityGrid gg = grids.get(prefix);
+                    if (gg == null) {
+                        grids.put(
+                                prefix,
+                                new GeoavailabilityGrid(prefix, 10)
+                        );
+                        gg = grids.get(prefix);
+                    }
+
+                    SpatialRange sr = Geohash.decodeHash(line);
+                    Coordinates coord = sr.getCenterPoint();
+                    //System.out.println(line + " -> " + coord);
+
+                    gg.addPoint(coord);
+                    line = br.readLine();
+                    dataCounter++;
                 }
 
-                SpatialRange sr = Geohash.decodeHash(line);
-                Coordinates coord = sr.getCenterPoint();
-                //System.out.println(line + " -> " + coord);
-
-                gg.addPoint(coord);
-
-                line = br.readLine();
+                iterations++;
+                br.close();
             }
-            br.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -51,7 +61,7 @@ public class GeoavailabilityGridTest {
         long totalTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(totalTimeNanoSeconds); // milliseconds
         long totalTimeSeconds = TimeUnit.NANOSECONDS.toSeconds(totalTimeNanoSeconds); // Seconds
         System.out.println("Time elapsed (nanoseconds): " + totalTimeNanoSeconds);
-        System.out.println("Time elapsed (milliseconds" + totalTimeMilliSeconds);
+        System.out.println("Time elapsed (milliseconds): " + totalTimeMilliSeconds);
         System.out.println("Time elapsed (seconds): " + totalTimeSeconds);
     }
 
