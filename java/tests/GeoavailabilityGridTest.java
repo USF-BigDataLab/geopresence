@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class GeoavailabilityGridTest {
     int dataCounter = 0; // Used for keeping track of insertions for a single iteration through the data set
-    int dataSize = 500; // maximum amount of data that should be read from the data set
+    int dataSize = 300000; // maximum amount of data that should be read from the data set
     int iterations = 0; // current number of iterations through the data set
-    int iterationSize = 500; // number of times the data set should be iterated through
+    int iterationSize = 5; // number of times the data set should be iterated through
 
     /*
         Function: public void readFileTest()
@@ -79,10 +79,7 @@ public class GeoavailabilityGridTest {
         long endTime = System.nanoTime();
         long totalTimeNanoSeconds = endTime - startTime; // nanoseconds
         long totalTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(totalTimeNanoSeconds); // milliseconds
-        long totalTimeSeconds = TimeUnit.NANOSECONDS.toSeconds(totalTimeNanoSeconds); // Seconds
-        System.out.println("Time elapsed (nanoseconds): " + totalTimeNanoSeconds);
         System.out.println("Time elapsed (milliseconds): " + totalTimeMilliSeconds);
-        System.out.println("Time elapsed (seconds): " + totalTimeSeconds);
     }
 
     /*

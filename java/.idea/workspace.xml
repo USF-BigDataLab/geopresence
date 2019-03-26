@@ -36,13 +36,13 @@
     <session id="-1328971092">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="4" />
+          <entry key="project.closed" value="5" />
           <entry key="project.open.time.1" value="1" />
-          <entry key="project.open.time.14" value="1" />
+          <entry key="project.open.time.14" value="2" />
           <entry key="project.open.time.16" value="1" />
           <entry key="project.open.time.22" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="5" />
+          <entry key="project.opened" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -63,18 +63,18 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="3884" />
+          <entry key="java" value="4008" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="3884" />
+          <entry key="JAVA" value="4008" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.44541192">
+    <splitter split-orientation="horizontal" split-proportion="0.22241087">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -98,11 +98,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/geogrid/Point.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="187">
-                  <caret line="34" column="12" selection-start-line="34" selection-start-column="12" selection-end-line="34" selection-end-column="12" />
+                <state relative-caret-position="255">
+                  <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
                 </state>
               </provider>
             </entry>
@@ -128,10 +128,10 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/geohashes.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="51">
+                <state relative-caret-position="-4467093">
                   <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
                 </state>
               </provider>
@@ -174,8 +174,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/tests/GeoavailabilityGridTest.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="119">
-                  <caret line="91" column="25" selection-start-line="91" selection-start-column="25" selection-end-line="91" selection-end-column="25" />
+                <state relative-caret-position="238">
+                  <caret line="74" column="31" lean-forward="true" selection-start-line="74" selection-start-column="31" selection-end-line="74" selection-end-column="31" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -220,7 +220,7 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="1055" />
-    <option name="y" value="-14" />
+    <option name="y" value="-15" />
     <option name="width" value="855" />
     <option name="height" value="1000" />
   </component>
@@ -230,6 +230,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -261,7 +262,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -269,7 +269,7 @@
     <property name="Downloaded.Files.Path.Enabled" value="true" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553631746450" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553637847988" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
     <property name="create.test.in.the.same.root" value="true" />
@@ -331,6 +331,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="GeoavailabilityGridTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="java" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="GeoavailabilityGridTest" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="GeoavailabilityGridTest.addPoint" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="java" />
       <option name="PACKAGE_NAME" value="" />
@@ -380,10 +389,12 @@
       <item itemvalue="Application.Driver" />
       <item itemvalue="JUnit.GeoavailabilityGridTest.addPoint" />
       <item itemvalue="JUnit.GeoavailabilityGridTest.readFileTest" />
+      <item itemvalue="JUnit.GeoavailabilityGridTest" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.GeoavailabilityGridTest.readFileTest" />
+        <item itemvalue="JUnit.GeoavailabilityGridTest" />
         <item itemvalue="JUnit.GeoavailabilityGridTest.addPoint" />
       </list>
     </recent_temporary>
@@ -402,18 +413,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 12h 25m 07s.xml">
-      <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 12h 25m 09s.xml">
-      <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 12h 25m 11s.xml">
-      <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 12h 25m 13s.xml">
-      <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 12h 25m 20s.xml">
       <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
     </history-entry>
@@ -432,12 +431,24 @@
     <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 12h 27m 54s.xml">
       <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 14h 51m 37s.xml">
+      <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="GeoavailabilityGridTest - 2019.03.26 at 14h 52m 30s.xml">
+      <configuration name="GeoavailabilityGridTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 15h 00m 17s.xml">
+      <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="GeoavailabilityGridTest_readFileTest - 2019.03.26 at 15h 00m 33s.xml">
+      <configuration name="GeoavailabilityGridTest.readFileTest" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.20939597" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20939597" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -446,7 +457,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32765958" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32765958" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -504,9 +515,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="595">
           <caret line="90" column="5" selection-start-line="90" selection-start-column="5" selection-end-line="90" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#6913#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -568,13 +576,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/geohashes.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/geogrid/BitmapVisualization.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="510">
@@ -601,15 +602,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/geogrid/Point.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="34" column="12" selection-start-line="34" selection-start-column="12" selection-end-line="34" selection-end-column="12" />
+        <state relative-caret-position="255">
+          <caret line="38" column="25" selection-start-line="38" selection-start-column="25" selection-end-line="38" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/geohashes.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4467093">
+          <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/GeoavailabilityGridTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="91" column="25" selection-start-line="91" selection-start-column="25" selection-end-line="91" selection-end-column="25" />
+        <state relative-caret-position="238">
+          <caret line="74" column="31" lean-forward="true" selection-start-line="74" selection-start-column="31" selection-end-line="74" selection-end-column="31" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
