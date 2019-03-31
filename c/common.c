@@ -1,4 +1,5 @@
 #include "./common.h"
+
 #define INDEXES_SIZE 1000
 /*
     File: common.c
@@ -52,24 +53,21 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
       - precision: Used by GeoCoord to calculate heigh and width
     Returns: Void
 */
-void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
+void rbitmap_add_all(struct rbitmap *bmp, const char *file_path, int precision){
   // can test w/ "../datasets/geohashes.txt"
-
   FILE *fp;
   char buff[255];
   GeoCoord temp_gc;
+  int index;
 
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
-    // printf("%s", buff);
-
     temp_gc = hash_to_geo(buff, precision);
-    int index = xy_to_index(temp_gc);
+    index = xy_to_index(temp_gc);
 
     roaring_bitmap_add(bmp->rbp, index);
     // printf("Cardinality = %llu \n", roaring_bitmap_get_cardinality(bmp->rbp));
   }
-
   fclose(fp);
 }
 
@@ -84,7 +82,7 @@ void rbitmap_add_all(struct rbitmap *bmp, char *file_path, int precision){
       - precision: Used by GeoCoord to calculate heigh and width
     Returns: Void
 */
-void rbitmap_add_all_buff(struct rbitmap *bmp, char *file_path, int precision){
+void rbitmap_add_all_buff(struct rbitmap *bmp, const char *file_path, int precision){
   FILE *fp;
   char buff[255];
   //const int indexes_size = 1000;
@@ -180,40 +178,4 @@ void coord_insertion_test(){
     printf("Testing addPoint function\n");
     printf("--------------------------------------------------\n");
     addPoint(test);
-}
-
-/*
-  Function: void insertion_benchmark()
-  Input: None
-  Output: None
-  Description: This function is used specifcally for benchmarking; this will
-  allow us to see the time performance of inserting points into the roaring
-  bitmap. 
-*/
-void insertion_benchmark() {
-    printf("STARTING INSERTION BENCHMARK\n");
-    clock_t start, end;
-    double time_taken;
-    start = clock();
-
-    struct rbitmap* test = init_rbitmap();
-    char* filename;
-    filename = "geohashes.txt";
-    rbitmap_add_all_buff(test, filename, 12);
-
-    // Custom iterator that the developers of CRoaring created
-    int counter = 0;
-    roaring_uint32_iterator_t * i = roaring_create_iterator(test->rbp);
-
-    while (i->has_value) {
-      printf("current value: %d\n", i->current_value); // Printing value at the given index
-      counter++;
-      roaring_advance_uint32_iterator(i);
-    }
-
-    roaring_free_uint32_iterator(i); // Free the iterator
-
-    end = clock();
-    time_taken = ((double) (end - start) / CLOCKS_PER_SEC);
-    printf("Total time (seconds): %f\n", time_taken);
 }

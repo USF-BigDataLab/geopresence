@@ -15,5 +15,15 @@ geohash.o: geohash.c geohash.h
 roaring.o: roaring.c roaring.h
 driver.o: driver.c
 
+insert_test: $(obj)
+	$(CC) $(CFLAGS) $(obj) -o $@
+
+bitmap.o: bitmap.c bitmap.h
+common.o: common.c common.h
+geogrid.o: geogrid.c geogrid.h
+geohash.o: geohash.c geohash.h
+roaring.o: roaring.c roaring.h
+insertion_benchmark.o: insertion_benchmark.c
+
 clean:
-	rm -f geo $(obj)
+	rm -f geo insert_test $(obj)

@@ -34,8 +34,8 @@ struct rbitmap {
 
 struct rbitmap* init_rbitmap();
 void free_rbitmap(struct rbitmap* f_rbitmap);
-void rbitmap_add_all(struct rbitmap *bitmap, char *file_path, int precision);
-void rbitmap_add_all_buff(struct rbitmap *bmp, char *file_path, int precision);
+void rbitmap_add_all(struct rbitmap *bitmap, const char *file_path, int precision);
+void rbitmap_add_all_buff(struct rbitmap *bmp, const char *file_path, int precision);
 void test();
 void value_ptr_test();
 void coord_insertion_test();
@@ -43,5 +43,4 @@ bool addPoint(struct rbitmap* bitmap);
 GeoCoord index_to_GeoCoord(int index, GeoCoord orig_coord);
 void index_to_geo_test();
 void xy_to_index_test();
-void insertion_benchmark();
 #endif
