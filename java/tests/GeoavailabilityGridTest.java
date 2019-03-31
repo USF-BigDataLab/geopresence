@@ -17,10 +17,41 @@ import java.util.concurrent.TimeUnit;
     data into the bitmap.
  */
 public class GeoavailabilityGridTest {
+    private final long MEGABYTE = 1024L * 1024L;
     int dataCounter = 0; // Used for keeping track of insertions for a single iteration through the data set
     int dataSize = 300000; // maximum amount of data that should be read from the data set
-    int iterations = 0; // current number of iterations through the data set
+    int iterations = 0; // current number of iterations through the data set. It's worth noting that
+    // this variable is also used to index through the runTimes and memoryUsage arrays; this is done because
+    // each index of the runTimes and memoryUsage arrays refers to a specific iteration.
     int iterationSize = 5; // number of times the data set should be iterated through
+
+    public long bytesToMegabytes(long bytes) {
+        return bytes / MEGABYTE;
+    }
+
+    // This function calculates the average for our data
+    public long calculateAverage(long[] data) {
+        long average = 0;
+        int len = data.length;
+
+        for (int i = 0; i < len; i++) {
+            average = average + data[i];
+        }
+
+        average = average / len;
+        return average;
+    }
+
+    public long calculateTotal(long[] data) {
+        int len = data.length;
+        long total = 0;
+
+        for (int i = 0; i < len; i++) {
+            total = total + data[i];
+        }
+
+        return total;
+    }
 
     /*
         Function: public void readFileTest()
@@ -37,12 +68,13 @@ public class GeoavailabilityGridTest {
      */
     @org.junit.Test
     public void readFileTest() {
-
-        long startTime = System.nanoTime();
+        long startTime = System.nanoTime(); // Used for calculating time
+        Map<String, GeoavailabilityGrid> grids = new HashMap<>(); // geogrid for testing
+        long[] runTimes = new long[100]; // Stores the run time of each iteration
+        long[] memoryUsage = new long[100]; // Stores the memory usage of each iteration
 
         try {
             while (iterations < iterationSize) {
-                Map<String, GeoavailabilityGrid> grids = new HashMap<>();
                 String filename = "geohashes.txt"; // Put file name here
                 BufferedReader br = new BufferedReader(new FileReader(filename));
                 String line = br.readLine();
@@ -62,24 +94,56 @@ public class GeoavailabilityGridTest {
 
                     SpatialRange sr = Geohash.decodeHash(line);
                     Coordinates coord = sr.getCenterPoint();
-                    //System.out.println(line + " -> " + coord);
+                    //System.out.println(line + " -> " + coord); // for testing
 
                     gg.addPoint(coord);
                     line = br.readLine();
                     dataCounter++;
                 }
 
+                Runtime runtime = Runtime.getRuntime(); // Java runtime object
+                long endTime = System.nanoTime();
+                long totalTimeNanoSeconds = endTime - startTime; // nanoseconds
+                long totalTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(totalTimeNanoSeconds); // milliseconds
+                runTimes[iterations] = totalTimeMilliSeconds;
+                runtime.gc(); // Runs the garbage collector
+                long memory = runtime.totalMemory() - runtime.freeMemory();
+                memoryUsage[iterations] = memory;
+                //System.out.println("Time elapsed (milliseconds): " + totalTimeMilliSeconds);
+
                 iterations++;
                 br.close();
             }
+
+            //System.out.println("Printing the times from the iteration"); // for testing
+
+            // Here for testing input validation
+            /*
+            for (int i = 0; i < iterationSize; i++) {
+                System.out.println(runTimes[i]);
+            }
+
+            for (int i = 0; i < iterationSize; i++) {
+                System.out.println(memoryUsage[i]);
+            }*/
+
+            long runTimeAverage = calculateAverage(runTimes);
+            long memoryUsageAverage = calculateAverage(memoryUsage);
+            long memoryUsageTotal = calculateTotal(memoryUsage);
+            long endTime = System.nanoTime();
+            long allIterationTime = endTime - startTime;
+            long allIterationTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(allIterationTime);
+
+            System.out.println("RESULTS");
+            System.out.println("-----------");
+            System.out.println("Average run time:  " + runTimeAverage + " milliseconds");
+            System.out.println("Average memory usage: " + memoryUsageAverage + " bytes");
+            System.out.println("Total iterations: " + iterationSize);
+            System.out.println("Total run time elapsed: " + allIterationTimeMilliSeconds + " milliseconds");
+            System.out.println("Total memory used: " + memoryUsageTotal + " bytes");
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        long endTime = System.nanoTime();
-        long totalTimeNanoSeconds = endTime - startTime; // nanoseconds
-        long totalTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(totalTimeNanoSeconds); // milliseconds
-        System.out.println("Time elapsed (milliseconds): " + totalTimeMilliSeconds);
     }
 
     /*
