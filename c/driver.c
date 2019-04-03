@@ -18,6 +18,38 @@ void print_results(const int iterationSize, const int cardinality,
   printf("Estimated insertions per second: %f\n", cardinality / total_insert_time);
 }
 
+/* Function: trimmed_data_set
+ * Creates a new file trimmed to the dataSize limit or all of original file's data
+ * Input:
+ *    - filename     : File to copy data from
+ *    - dataSize     : Limit of data copied
+ *    - new_filename : Where the new file is created
+ * Returns: Size of new file
+*/
+int trimmed_data_set(const char *filename, const int dataSize, char *new_filename){
+  // 1. Create or override new file w name trimmed_ + filename
+  // 2. Copy data over from filename to new file
+  //     a. Break when >= dataSize OR when original file reaches end of file
+  // 3. Return number of data copied
+
+  sprintf(new_filename, "trimmed_%s", filename);
+
+  FILE *fp, *nfp;
+  char buff[255];
+  int dataCount = 0;
+
+  fp = fopen(filename, "r");
+  nfp = fopen(new_filename, "w");
+  while(fgets(buff, 255, (FILE*) fp) && dataCount < dataSize){
+    fputs(buff, nfp);
+    dataCount += 1;
+  }
+  fclose(fp);
+  fclose(nfp);
+
+  return dataCount;
+}
+
 double get_elapsed_sec(struct timeval start, struct timeval end){
   double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
   elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0; // us to ms
@@ -26,15 +58,11 @@ double get_elapsed_sec(struct timeval start, struct timeval end){
   return elapsed_time;
 }
 
-void insertion_benchmark() {
+void insertion_benchmark(const char *filename, const int iterationSize) {
     printf("\nSTARTING INSERTION BENCHMARK\n");
-    const int iterationSize = 5;
-
     struct timeval start, end;
-    double elapsed_time, total_insert_time = 0, total_base_time = 0;
-
+    double total_insert_time = 0, total_base_time = 0;
     struct rbitmap* test;
-    const char* filename = "geohashes.txt";
 
     for(int iterations = 0; iterations < iterationSize; iterations++){
       test = init_rbitmap();
@@ -68,11 +96,6 @@ void insertion_benchmark() {
 
 /*
   Function: void buff_insertion_benchmark()
-  Input: None
-  Output: None
-  Description: This function is used specifcally for benchmarking; this will
-  allow us to see the time performance of inserting points into the roaring
-  bitmap.
 */
 void buff_insertion_benchmark() {
     printf("\nSTARTING BUFF INSERTION BENCHMARK\n");
@@ -115,9 +138,21 @@ void buff_insertion_benchmark() {
 }
 
 int main() {
-  buff_insertion_benchmark();
 
-  insertion_benchmark();
+  const char *geohashFile = "geohashes.txt";
+  const int dataSize = 262792; iterationSize = 5;
+  char newGeohashFile[125];
+
+  const int dataSetNum = trimmed_data_set(geohashFile, dataSize, newGeohashFile);
+  if(dataSetNum < dataSize){
+    printf("ERROR: File %s with total set of %d is unabled to be trimmed to %d\n", geohashFile, dataSetNum, dataSize);
+    return 1;
+  }
+
+  // buff_insertion_benchmark();
+  insertion_benchmark(geohashFile, iterationSize);
+
+  remove(newGeohashFile);
 
   return 0;
 }
