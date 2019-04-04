@@ -5,24 +5,12 @@
 #include "./roaring.h"
 #include <sys/time.h>
 
-#define DATA_SZ_LEN 10
-#define ITERATION_SZ 100
+#define DATA_SZ 10
+#define ITERATION_SZ 20
 
-void print_results(const int iterationSize, const int cardinality,
-  double total_insert_time, double total_base_time){
-
+void print_results(int dataSize, double avg_insert_time){
   printf("\nRESULTS\n");
-  printf("Total iterations: %d\n", iterationSize);
-  printf("Cardinality (per iteration): %d\n", cardinality);
-  printf("Total insert time (sec): %f\n", total_insert_time);
-  printf("Average insertion time (sec): %f\n", total_insert_time / iterationSize);
-  printf("Average base time (sec): %f\n", total_base_time / iterationSize);
-  printf("Estimated insertions per second: %f\n", cardinality / total_insert_time);
-}
-
-void print_results2(const int iterationSize, int dataSize, double avg_insert_time){
-  printf("\nRESULTS\n");
-  printf("Total iterations: %d\n", iterationSize);
+  printf("Total iterations: %d\n", ITERATION_SZ);
   printf("Total inserts (per iteration): %d\n", dataSize);
   // printf("Total insert time (sec): %f\n", total_insert_time);
   printf("Average insertion time (sec): %f\n", avg_insert_time);
@@ -38,11 +26,6 @@ void print_results2(const int iterationSize, int dataSize, double avg_insert_tim
  * Returns: Size of new file
 */
 int trimmed_data_set(const char *filename, const int dataSize, char *new_filename){
-  // 1. Create or override new file w name trimmed_ + filename
-  // 2. Copy data over from filename to new file
-  //     a. Break when >= dataSize OR when original file reaches end of file
-  // 3. Return number of data copied
-
   sprintf(new_filename, "trimmed_%s", filename);
 
   FILE *fp, *nfp;
@@ -69,13 +52,15 @@ double get_elapsed_sec(struct timeval start, struct timeval end){
   return elapsed_time;
 }
 
-void insertion_benchmark(const char *filename, const int iterationSize, double *avg_insert_time) {
-    // printf("\nSTARTING INSERTION BENCHMARK\n");
+void insertion_benchmark(const char *filename, double *avg_insert_time) {
+    // printf("\nSTARTING INSERTION BENCHMARK\n");total_insert_time
+    // TODO: Get the avg insert time of all iterations
+    double running_insert_time = 0;
     struct timeval start, end;
-    double total_insert_time = 0, total_base_time = 0;
+    double total_base_time = 0;
     struct rbitmap* test;
 
-    for(int iterations = 0; iterations < iterationSize; iterations++){
+    for(int iter = 0; iter < ITERATION_SZ; iter++){
       test = init_rbitmap();
 
       /* Time insertion */
@@ -84,7 +69,8 @@ void insertion_benchmark(const char *filename, const int iterationSize, double *
       gettimeofday(&end, NULL);
 
       /* Get elapsed time for inserting into empty bitmap */
-      total_insert_time += get_elapsed_sec(start, end);
+      // *total_insert_time += get_elapsed_sec(start, end);
+      running_insert_time += get_elapsed_sec(start, end);
 
       /* Getting time for already populated bitmap,
          no insertions should be happening */
@@ -97,7 +83,7 @@ void insertion_benchmark(const char *filename, const int iterationSize, double *
       roaring_bitmap_free(test->rbp); //rest for next iteration
     }
 
-    *avg_insert_time = total_insert_time / iterationSize;
+    *avg_insert_time = running_insert_time / ITERATION_SZ;
 }
 
 /*
@@ -105,7 +91,6 @@ void insertion_benchmark(const char *filename, const int iterationSize, double *
 */
 void buff_insertion_benchmark() {
     printf("\nSTARTING BUFF INSERTION BENCHMARK\n");
-    const int iterationSize = 5;
 
     struct timeval start, end;
     double total_insert_time = 0, total_base_time = 0;
@@ -113,7 +98,7 @@ void buff_insertion_benchmark() {
     struct rbitmap* test;
     const char* filename = "geohashes.txt";
 
-    for(int iterations = 0; iterations < iterationSize; iterations++){
+    for(int iterations = 0; iterations < ITERATION_SZ; iterations++){
       test = init_rbitmap();
 
       /* Time insertion */
@@ -136,24 +121,21 @@ void buff_insertion_benchmark() {
     }
 
     /* Get cardinality */
-    test = init_rbitmap();
-    rbitmap_add_all_buff(test, filename, 12);
-    const int cardinality = roaring_bitmap_get_cardinality(test->rbp);
+    // test = init_rbitmap();
+    // rbitmap_add_all_buff(test, filename, 12);
+    // const int cardinality = roaring_bitmap_get_cardinality(test->rbp);
 
-    print_results(iterationSize, cardinality, total_insert_time, total_base_time);
+    // print_results(ITERATION_SZ, cardinality, total_insert_time, total_base_time);
 }
 
 int main() {
 
   printf("\nSTARTING INSERTION BENCHMARK\n");
 
-  int dataSizes [DATA_SZ_LEN] = {5, 50, 250, 500, 750, 1000, 1500, 2000, 2500, 30000};
-  // {26000, 52000, 78000, 104000, 130000, 156000, 182000, 208000, 234000, 260000}
-  // int dataSize = 262792;
+  int dataSizes [DATA_SZ] = {26000, 52000, 78000, 104000, 130000, 156000, 182000, 208000, 234000, 260000};
   const char *geohashFile = "geohashes.txt"; // has 262,792 hashes
-  // const int iterationSize = 5;
 
-  for(int i = 0; i < DATA_SZ_LEN; i++){
+  for(int i = 0; i < DATA_SZ; i++){
     double avg_insert_time = 0;
     char newGeohashFile[125];
 
@@ -163,8 +145,8 @@ int main() {
       return 1;
     }
 
-    insertion_benchmark(geohashFile, ITERATION_SZ, &avg_insert_time);
-    print_results2(ITERATION_SZ, dataSizes[i], avg_insert_time);
+    insertion_benchmark(geohashFile, &avg_insert_time);
+    print_results(dataSizes[i], avg_insert_time);
     // TODO: Put results into a txt file
 
     remove(newGeohashFile);
