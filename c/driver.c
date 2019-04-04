@@ -6,14 +6,14 @@
 #include <sys/time.h>
 
 #define DATA_SZ 10
-#define ITERATION_SZ 20
+#define ITERATION_SZ 100
 
 void print_results(int dataSize, double avg_insert_time){
   printf("\nRESULTS\n");
   printf("Total iterations: %d\n", ITERATION_SZ);
   printf("Total inserts (per iteration): %d\n", dataSize);
   // printf("Total insert time (sec): %f\n", total_insert_time);
-  printf("Average insertion time (sec): %f\n", avg_insert_time);
+  printf("Average insertion time (ms): %f\n", avg_insert_time);
   // printf("Average insertions per second: %f\n", dataSize / total_insert_time);
 }
 
@@ -52,6 +52,10 @@ double get_elapsed_sec(struct timeval start, struct timeval end){
   return elapsed_time;
 }
 
+double get_elapsed_ms(struct timeval start, struct timeval end){
+  return get_elapsed_sec(start, end) * 1000;
+}
+
 void insertion_benchmark(const char *filename, double *avg_insert_time) {
     // printf("\nSTARTING INSERTION BENCHMARK\n");total_insert_time
     // TODO: Get the avg insert time of all iterations
@@ -69,8 +73,8 @@ void insertion_benchmark(const char *filename, double *avg_insert_time) {
       gettimeofday(&end, NULL);
 
       /* Get elapsed time for inserting into empty bitmap */
-      // *total_insert_time += get_elapsed_sec(start, end);
-      running_insert_time += get_elapsed_sec(start, end);
+      // running_insert_time += get_elapsed_sec(start, end);
+      running_insert_time += get_elapsed_ms(start, end);
 
       /* Getting time for already populated bitmap,
          no insertions should be happening */
@@ -78,7 +82,8 @@ void insertion_benchmark(const char *filename, double *avg_insert_time) {
       rbitmap_add_all(test, filename, 12);
       gettimeofday(&end, NULL);
 
-      total_base_time += get_elapsed_sec(start, end);
+      // total_base_time += get_elapsed_sec(start, end);
+      total_base_time += get_elapsed_ms(start, end);
 
       roaring_bitmap_free(test->rbp); //rest for next iteration
     }
