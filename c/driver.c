@@ -5,19 +5,26 @@
 #include "./roaring.h"
 #include <sys/time.h>
 
-#define DATA_SZ 10
+#define PRECISION 12
 #define ITERATION_SZ 100
+#define DATA_SZ 10
+
+// Global
+int dataSizes [DATA_SZ] = {26000, 52000, 78000, 104000, 130000, 156000, 182000, 208000, 234000, 260000};
+const int dataSize = 26000;
+const char *geohashFile = "geohashes.txt"; // has 262,792 hashes
 
 void print_results(int dataSize, double avg_insert_time){
   printf("\nRESULTS\n");
   printf("Total iterations: %d\n", ITERATION_SZ);
   printf("Total inserts (per iteration): %d\n", dataSize);
   // printf("Total insert time (sec): %f\n", total_insert_time);
-  printf("Average insertion time (ms): %f\n", avg_insert_time);
+  printf("Average insertion time (sec): %f\n", avg_insert_time);
+  // printf("Average insertion time (ms): %f\n", avg_insert_time);
   // printf("Average insertions per second: %f\n", dataSize / total_insert_time);
 }
 
-/* Function: trimmed_data_set
+/* Function: trim_data_set
  * Creates a new file trimmed to the dataSize limit or all of original file's data
  * Input:
  *    - filename     : File to copy data from
@@ -25,7 +32,7 @@ void print_results(int dataSize, double avg_insert_time){
  *    - new_filename : Where the new file is created
  * Returns: Size of new file
 */
-int trimmed_data_set(const char *filename, const int dataSize, char *new_filename){
+int trim_data_set(const char *filename, const int dataSize, char *new_filename){
   sprintf(new_filename, "trimmed_%s", filename);
 
   FILE *fp, *nfp;
@@ -57,7 +64,7 @@ double get_elapsed_ms(struct timeval start, struct timeval end){
 }
 
 void insertion_benchmark(const char *filename, double *avg_insert_time) {
-    // printf("\nSTARTING INSERTION BENCHMARK\n");total_insert_time
+    // printf("\nReading file: %s\n", filename);
     // TODO: Get the avg insert time of all iterations
     double running_insert_time = 0;
     struct timeval start, end;
@@ -69,26 +76,32 @@ void insertion_benchmark(const char *filename, double *avg_insert_time) {
 
       /* Time insertion */
       gettimeofday(&start, NULL);
-      rbitmap_add_all(test, filename, 12);
+      rbitmap_add_all(test, filename, PRECISION);
       gettimeofday(&end, NULL);
 
       /* Get elapsed time for inserting into empty bitmap */
-      // running_insert_time += get_elapsed_sec(start, end);
-      running_insert_time += get_elapsed_ms(start, end);
+      running_insert_time += get_elapsed_sec(start, end);
+      // running_insert_time += get_elapsed_ms(start, end);
 
       /* Getting time for already populated bitmap,
          no insertions should be happening */
       gettimeofday(&start, NULL);
-      rbitmap_add_all(test, filename, 12);
+      rbitmap_add_all(test, filename, PRECISION);
       gettimeofday(&end, NULL);
 
-      // total_base_time += get_elapsed_sec(start, end);
-      total_base_time += get_elapsed_ms(start, end);
+      total_base_time += get_elapsed_sec(start, end);
+      // total_base_time += get_elapsed_ms(start, end);
 
       roaring_bitmap_free(test->rbp); //rest for next iteration
     }
 
     *avg_insert_time = running_insert_time / ITERATION_SZ;
+
+    /* Get cardinality */
+    test = init_rbitmap();
+    rbitmap_add_all(test, filename, PRECISION);
+    const int cardinality = roaring_bitmap_get_cardinality(test->rbp);
+    printf("Cardinality: %d\n", cardinality);
 }
 
 /*
@@ -108,7 +121,7 @@ void buff_insertion_benchmark() {
 
       /* Time insertion */
       gettimeofday(&start, NULL);
-      rbitmap_add_all_buff(test, filename, 12);
+      rbitmap_add_all_buff(test, filename, PRECISION);
       gettimeofday(&end, NULL);
 
       /* Get elapsed time for inserting into empty bitmap */
@@ -117,7 +130,7 @@ void buff_insertion_benchmark() {
       /* Getting time for already populated bitmap,
          no insertions should be happening */
       gettimeofday(&start, NULL);
-      rbitmap_add_all_buff(test, filename, 12);
+      rbitmap_add_all_buff(test, filename, PRECISION);
       gettimeofday(&end, NULL);
 
       total_base_time += get_elapsed_sec(start, end);
@@ -127,7 +140,7 @@ void buff_insertion_benchmark() {
 
     /* Get cardinality */
     // test = init_rbitmap();
-    // rbitmap_add_all_buff(test, filename, 12);
+    // rbitmap_add_all_buff(test, filename, PRECISION);
     // const int cardinality = roaring_bitmap_get_cardinality(test->rbp);
 
     // print_results(ITERATION_SZ, cardinality, total_insert_time, total_base_time);
@@ -136,26 +149,28 @@ void buff_insertion_benchmark() {
 int main() {
 
   printf("\nSTARTING INSERTION BENCHMARK\n");
-
-  int dataSizes [DATA_SZ] = {26000, 52000, 78000, 104000, 130000, 156000, 182000, 208000, 234000, 260000};
-  const char *geohashFile = "geohashes.txt"; // has 262,792 hashes
-
-  for(int i = 0; i < DATA_SZ; i++){
-    double avg_insert_time = 0;
+  FILE *r_fp = fopen("results.txt", "w");
+  double avg_insert_time;
+  for(int i = 0; i < 1; i++){
+    avg_insert_time = 0;
     char newGeohashFile[125];
 
-    const int dataSetNum = trimmed_data_set(geohashFile, dataSizes[i], newGeohashFile);
+    const int dataSetNum = trim_data_set(geohashFile, dataSizes[i], newGeohashFile);
     if(dataSetNum < dataSizes[i]){
-      printf("ERROR: File %s with total set of %d is unabled to be trimmed to %d\n", geohashFile, dataSetNum, dataSizes[i]);
+      printf("ERROR: File %s with total set of %d is unabled to be trimmed to %d\n", newGeohashFile, dataSetNum, dataSizes[i]);
       return 1;
     }
 
-    insertion_benchmark(geohashFile, &avg_insert_time);
+    insertion_benchmark(newGeohashFile, &avg_insert_time);
     print_results(dataSizes[i], avg_insert_time);
-    // TODO: Put results into a txt file
+    fprintf(r_fp, "%d\t%f\n", dataSizes[i], avg_insert_time);
 
     remove(newGeohashFile);
   }
+  fclose(r_fp);
+
+  // struct rbitmap* test = init_rbitmap();
+  // rbitmap_add_all(test, geohashFile, PRECISION);
 
   // buff_insertion_benchmark();
 
