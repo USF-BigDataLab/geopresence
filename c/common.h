@@ -28,7 +28,7 @@
 */
 
 struct rbitmap {
-    GeoCoord gc; //GeoCoord struct
+    GeoCoord gc; //Base geocoord
     roaring_bitmap_t *rbp; //Roaring bit map
 };
 
