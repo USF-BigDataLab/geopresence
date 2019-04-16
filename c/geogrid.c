@@ -116,51 +116,6 @@ GeoCoord hash_to_geo(char* base_geo_hash, int precision){
 }
 
 /*
-    Function: bool addPoint()
-    Input: struct rbitmap* bitmap - bitmap struct that will have a point
-    added to it.
-    Output: bool
-    Description: This function adds a new point to the
-		 geogrid; it looks like the Java version
-		 uses the Coordinates object in the arguments,
-		 but we'll pass in int x and int y for now.
-		 Coordinates are in latitude and longitude
-		 according to the Java documentation.
-*/
-bool addPoint(struct rbitmap* bitmap) {
-    int index = xy_to_index(bitmap->gc);
-    printf("Trying to insert at index: %d\n", index);
-
-    /*
-    if (bitmap->gc.latitude < 0 || bitmap->gc.longitude < 0) {
-
-        return false;
-    } */
-
-    //if roaring bitmap index == false, then
-    //add index to the pendingUpdates data structure.
-    //In the Java code, this checks if the bit at the given
-    //index is set. However, in the CRoaring library, this
-    //idea of checking a specific index does not exist (at least
-    //based on the documentation in the readme); that being said,
-    //we'll need to use the cardinality function to see how many bits are
-    //are set in the map; if there are less bits than the index we want to set, then
-    //we can insert it.
-    uint32_t cardinality = roaring_bitmap_get_cardinality(bitmap->rbp);
-
-    //This means the index is NOT set because we have to insert data sequentially
-    if (cardinality < index) {
-        //Add to pending updates
-        //TODO: write data structure insertion functionality here
-        printf("Adding index: %d to the update queue\n", index); //for testing
-    } else {
-        printf("The index was NOT added to the update queue\n");
-    }
-
-    return true;
-}
-
-/*
     Function: xy_to_index(GeoCoord gc)
     Input: GeoCoord gc - the struct that the
 	   x and y coordinates will be retrieved
@@ -172,6 +127,14 @@ bool addPoint(struct rbitmap* bitmap) {
 int xy_to_index(GeoCoord gc) {
     int index = (gc.longitude * gc.dimension.width) + gc.latitude;
     return index;
+}
+
+/*
+* Function: geo_to_index
+* Create an index relative to base GeoCoord.
+*/
+int geo_to_index(GeoCoord base_geo, GeoCoord geo){
+  return (geo.latitude * base_geo.dimension.width) + geo.longitude;
 }
 
 /*
@@ -212,68 +175,4 @@ GeoCoord index_to_GeoCoord(int index, GeoCoord orig_coord) {
 GeoCoord xy_to_GeoCoord(int x, int y) {
     GeoCoord new_geo = {0};
     return new_geo;
-}
-
-/*
-    Function: apply_updates()
-    Input: void
-    Output: void
-    Description: This will apply our updates to the
-    bitmap.
-*/
-void apply_updates(){
-
-}
-
-//NOTICE:
-//Can indices be negative? This raises some questions. I presume they can't be, but
-//perhaps there's a reason; the test function returns a negative index and it's because
-//the calculation uses latitude and longitude, which can be negative.
-void xy_to_index_test() {
-    printf("**************************************************\n");
-    printf("Starting initialize bitmap test\n");
-    printf("--------------------------------------------------\n");
-    struct rbitmap* test = init_rbitmap();
-    printf("Sucessfully initialized bitmap\n");
-    printf("**************************************************\n\n");
-
-    printf("**************************************************\n");
-    printf("Testing xy_to_index function\n");
-    printf("--------------------------------------------------\n");
-
-    int t = xy_to_index(test->gc);
-
-    printf("Here is the index: %d\n", t);
-    printf("**************************************************\n");
-}
-
-void index_to_geo_test(){
-    printf("**************************************************\n");
-    printf("Starting initialize bitmap test\n");
-    printf("--------------------------------------------------\n");
-    struct rbitmap* test = init_rbitmap();
-    printf("Sucessfully initialized bitmap\n");
-    printf("**************************************************\n\n");
-
-    printf("**************************************************\n");
-    printf("Testing index_to_GeoCoord function\n");
-    printf("--------------------------------------------------\n");
-
-    printf("**************************************************\n");
-    printf("Getting values before function call\n");
-    printf("--------------------------------------------------\n");
-    printf("GeoCoord info: \n");
-    printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-    test->gc.latitude, test->gc.longitude, test->gc.dimension.height, test->gc.dimension.width);
-    printf("**************************************************\n");
-
-    test->gc = index_to_GeoCoord(1, test->gc);
-
-    printf("**************************************************\n");
-    printf("Getting values after the function call\n");
-    printf("--------------------------------------------------\n");
-    printf("GeoCoord info: \n");
-    printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-    test->gc.latitude, test->gc.longitude, test->gc.dimension.height, test->gc.dimension.width);
-    printf("**************************************************\n");
 }
