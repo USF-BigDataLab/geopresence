@@ -7,6 +7,7 @@
 #include "geogrid.h"
 #include "roaring.h"
 #include "geohash.h"
+#include "uthash-master/src/uthash.h"
 
 /*
     File common.h
