@@ -148,8 +148,12 @@ void buff_insertion_benchmark() {
 
 void hashmap_test() {
   add_cell(1, 12);
-  struct bitmap_hm_data *result = find_cell_data(1);
+  struct bitmap_hm_data *result = find_cell(1);
   printf("Printing the value retrieved from the hashmap: %d\n", result->cardinality);
+  // delete_cell(1);
+  unsigned int len = get_hm_length();
+  printf("Printing the length of the hashmap: %u\n", len);
+  print_cells();
 }
 
 int main() {
@@ -173,11 +177,11 @@ int main() {
     remove(newGeohashFile);
   }
   fclose(r_fp);
-
+  
   // struct rbitmap* test = init_rbitmap();
   // rbitmap_add_all(test, geohashFile, PRECISION);
   // buff_insertion_benchmark();
-  //hashmap_test();
+  // hashmap_test();
 
   return 0;
 }
