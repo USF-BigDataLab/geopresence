@@ -9,4 +9,5 @@ struct bitmap_hm_data {
     UT_hash_handle hh; // makes this struct hashable 
 };
 
-void add_cell(struct bitmap_hm_data *bm_hm_d);
+void add_cell(int bm_cell, int card);
+struct bitmap_hm_data *find_cell_data(int cell);
