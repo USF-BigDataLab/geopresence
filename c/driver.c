@@ -160,7 +160,6 @@ void hashmap_test() {
 }
 
 int main() {
-  /*
   printf("\nSTARTING INSERTION BENCHMARK\n");
   FILE *r_fp = fopen("results.txt", "w");
   double avg_insert_time;
@@ -181,12 +180,12 @@ int main() {
     remove(newGeohashFile);
   }
   fclose(r_fp);
-  */
+  
 
   // struct rbitmap* test = init_rbitmap();
   // rbitmap_add_all(test, geohashFile, PRECISION);
   // buff_insertion_benchmark();
-  hashmap_test();
+  // hashmap_test();
 
   return 0;
 }
