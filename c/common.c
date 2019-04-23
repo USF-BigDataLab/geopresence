@@ -52,8 +52,7 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
     Returns: Void
 */
 void rbitmap_add_all(struct rbitmap *bmp, const char *file_path, int precision){
-  // can test w/ "../datasets/geohashes.txt"
-  FILE *fp, *tfp;
+  FILE *fp;
   char buff[255];
   GeoCoord temp_gc;
   int index;

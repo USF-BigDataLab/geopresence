@@ -26,8 +26,8 @@
 
 
 void print_gc(GeoCoord gc){
-  printf("Latitude: %lf    Longitude: %lf\nHeight: %lf    Width: %lf\n",
-  gc.latitude, gc.longitude, gc.dimension.height, gc.dimension.width);
+  printf("Latitude: %lf\tLongitude: %lf\nHeight: %lf\tWidth: %lf\n North: %lf\n East: %lf\n South: %lf\n West: %lf\n",
+  gc.latitude, gc.longitude, gc.dimension.height, gc.dimension.width, gc.north, gc.east, gc.south, gc.west);
 }
 
 /*
@@ -135,6 +135,38 @@ int xy_to_index(GeoCoord gc) {
 */
 int geo_to_index(GeoCoord base_geo, GeoCoord geo){
   return (geo.latitude * base_geo.dimension.width) + geo.longitude;
+}
+
+int coord_to_index(GeoCoord base_coords, GeoCoord t_coord){
+  float x_diff = t_coord.longitude - base_coords.west;
+  float y_diff = t_coord.latitude - base_coords.south;
+
+  int y = y_diff; //should use y_degree_per_pixel?
+  int x = x_diff;
+  int width = base_coords.dimension.width;
+
+  return (int) (y * width) + x; //algorithm to convert 2D to 1D
+}
+
+// Removing once done fixing indexing
+// The result file uniq word count should match the number of geohashes read in
+void test_indexing(){
+  GeoCoord base_geo = geohash_decode("8");
+  base_geo.dimension = geohash_dimensions_for_precision(1);
+  print_gc(base_geo);
+
+  FILE *geo_fp, *r_fp;
+  char buff[255];
+
+  geo_fp = fopen("./8-geohashes.txt", "r"); //hashes only in the 8 region
+  r_fp = fopen("8-indexes.txt", "w");
+  while(fgets(buff, 255, (FILE *) geo_fp)){
+    GeoCoord temp_geo = geohash_decode(buff);
+    int index = coord_to_index(base_geo, temp_geo);
+    fprintf(r_fp, "%d\t%lf\t%lf\n", index, temp_geo.latitude, temp_geo.longitude);
+  }
+  fclose(geo_fp);
+  fclose(r_fp);
 }
 
 /*
