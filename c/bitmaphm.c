@@ -6,20 +6,21 @@ struct bitmap_hm_data *g_bm_hm_data = NULL;
 
 /* 
     Function: void add_cell(struct bitmap_hm_data *bm_hm_d)
-    Input: int bm_cell - the bitmap cell to use as the key
+    Input: char* bm_cell - the bitmap cell to use as the key; this char* 
+                            should be the first two chars of the hash
            int card - the cardinality of the cell (value in hm)
     Output: None
     Purpose: This function is for adding more values to the hashmap
     We will pass in the data we want to put in the struct so that
     the function can do the memory allocation for us. 
 */
-void add_cell(int bm_cell, int card) {
+void add_cell(char* cell, int card) {
     struct bitmap_hm_data *hm_entry; 
     hm_entry = malloc(sizeof(struct bitmap_hm_data));
-    hm_entry->bitmap_cell = bm_cell;
+    strcpy(hm_entry->bitmap_cell, cell); // strcpy the cell
     hm_entry->cardinality = card; 
     /* Keep in mind that bitmap_cell is the name of the key field to use */
-    HASH_ADD_INT(g_bm_hm_data, bitmap_cell, hm_entry); 
+    HASH_ADD_STR(g_bm_hm_data, bitmap_cell, hm_entry); 
 }
 
 /* 
@@ -29,9 +30,9 @@ void add_cell(int bm_cell, int card) {
     Output: struct bitmap_hm-data *found_entry - returns the found entry in the hashmap
     Purpose: This function is for finding the struct data for the given cell
 */
-struct bitmap_hm_data *find_cell(int cell) {
+struct bitmap_hm_data *find_cell(char* cell) {
     struct bitmap_hm_data *found_entry;
-    HASH_FIND_INT(g_bm_hm_data, &cell, found_entry);
+    HASH_FIND_STR(g_bm_hm_data, cell, found_entry);
     return found_entry;
 }
 
@@ -41,10 +42,10 @@ struct bitmap_hm_data *find_cell(int cell) {
     Output: None
     Purpose: This function is for deleting a struct from the hashmap
 */
-void delete_cell(int cell) {
+void delete_cell(char* cell) {
     struct bitmap_hm_data *entry = find_cell(cell);
     HASH_DEL(g_bm_hm_data, entry);
-    printf("The data at cell %d has been deleted and will be freed", cell);
+    printf("The data at cell %s has been deleted and will be freed\n", cell);
     free(entry); // might need to be careful about where we free this data
 }
 
@@ -70,6 +71,6 @@ void print_cells() {
     struct bitmap_hm_data *entry;
 
     for (entry = g_bm_hm_data; entry != NULL; entry = entry->hh.next) {
-        printf("Cell: %d, cardinality: %d\n", entry->bitmap_cell, entry->cardinality);
+        printf("Cell: %s, cardinality: %d\n", entry->bitmap_cell, entry->cardinality);
     }
 }
