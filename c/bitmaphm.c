@@ -25,7 +25,7 @@ void add_cell(char* cell, int card) {
 
 /* 
     Function: struct bitmap_hm_data *find_cell(int cell) 
-    Input: int cell - the cell (key value) that we want to find the cardinality for;
+    Input: char* cell - the cell (key value) that we want to find the cardinality for;
     this is our way of finding a specific cell's cardinality in the hashmap. 
     Output: struct bitmap_hm-data *found_entry - returns the found entry in the hashmap
     Purpose: This function is for finding the struct data for the given cell
@@ -38,7 +38,7 @@ struct bitmap_hm_data *find_cell(char* cell) {
 
 /* 
     Function: void delete_cell(int cell)
-    Input: int cell - the cell (key value) of the struct we want to delete from the hashmap
+    Input: char* cell - the cell (key value) of the struct we want to delete from the hashmap
     Output: None
     Purpose: This function is for deleting a struct from the hashmap
 */
