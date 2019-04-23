@@ -32,7 +32,7 @@ struct rbitmap {
     roaring_bitmap_t *rbp; //Roaring bit map
 };
 
-struct rbitmap* init_rbitmap();
+struct rbitmap* init_rbitmap(char *base_geohash, int base_precision);
 void free_rbitmap(struct rbitmap* f_rbitmap);
 void rbitmap_add_all(struct rbitmap *bitmap, const char *file_path, int precision);
 void rbitmap_add_all_buff(struct rbitmap *bmp, const char *file_path, int precision);

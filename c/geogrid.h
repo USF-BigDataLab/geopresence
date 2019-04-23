@@ -12,9 +12,9 @@ GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision);
 GeoCoord hash_to_geo(char* base_geo_hash, int precision);
 //bool addPoint(struct rbitmap* bitmap);
 int xy_to_index(GeoCoord gc);
-int geo_to_index(GeoCoord base_geo, GeoCoord geo);
+int coords_to_index(GeoCoord base_coords, GeoCoord t_coord);
+GeoCoord index_to_GeoCoord(int index, GeoCoord orig_coord);
 /*
-GeoCoord* index_to_GeoCoord(int index);
 GeoCoord* xy_to_GeoCoord(int x, int y);
 */
 #endif

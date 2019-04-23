@@ -128,45 +128,54 @@ int xy_to_index(GeoCoord gc) {
     int index = (gc.longitude * gc.dimension.width) + gc.latitude;
     return index;
 }
+/*
+float get_x_deg_per_pixel(GeoCoord base_coords){
+  float x_degrees = base_coords.east - base_coords.west;
+  return x_degrees / (float) base_coords.dimension.width;
+}
+
+float get_y_deg_per_pixel(GeoCoord base_coords){
+  float y_degrees = base_coords.south - base_coords.north;
+  // float y_degrees = base_coords.north - base_coords.south;
+  return y_degrees / (float) base_coords.dimension.width;
+}
+
+void coords_to_xy(GeoCoord base_coords, GeoCoord coords, int *x, int *y){
+  float x_diff = coords.longitude - base_coords.west;
+  float y_diff = coords.latitude - base_coords.south;
+
+  *x = (float) (x_diff / get_x_deg_per_pixel(base_coords));
+  *y = (float) (y_diff / get_y_deg_per_pixel(base_coords));
+}
+*/
 
 /*
-* Function: geo_to_index
-* Create an index relative to base GeoCoord.
+* Function: coords_to_index
+* Generates an index of one coord relative to a base geo coord.
+* Input:
+*     - base_coords: Base geo coord used for relativety
+*     - t_coord: Coord converted to an index
+* Returns: An index
 */
-int geo_to_index(GeoCoord base_geo, GeoCoord geo){
-  return (geo.latitude * base_geo.dimension.width) + geo.longitude;
-}
-
-int coord_to_index(GeoCoord base_coords, GeoCoord t_coord){
+int coords_to_index(GeoCoord base_coords, GeoCoord t_coord){
   float x_diff = t_coord.longitude - base_coords.west;
   float y_diff = t_coord.latitude - base_coords.south;
+  float width = base_coords.dimension.width * base_coords.dimension.height;
 
-  int y = y_diff; //should use y_degree_per_pixel?
-  int x = x_diff;
-  int width = base_coords.dimension.width;
-
-  return (int) (y * width) + x; //algorithm to convert 2D to 1D
+  return (int) (y_diff * width) + x_diff; //algorithm to convert 2D to 1D
 }
 
-// Removing once done fixing indexing
-// The result file uniq word count should match the number of geohashes read in
-void test_indexing(){
-  GeoCoord base_geo = geohash_decode("8");
-  base_geo.dimension = geohash_dimensions_for_precision(1);
-  print_gc(base_geo);
-
-  FILE *geo_fp, *r_fp;
-  char buff[255];
-
-  geo_fp = fopen("./8-geohashes.txt", "r"); //hashes only in the 8 region
-  r_fp = fopen("8-indexes.txt", "w");
-  while(fgets(buff, 255, (FILE *) geo_fp)){
-    GeoCoord temp_geo = geohash_decode(buff);
-    int index = coord_to_index(base_geo, temp_geo);
-    fprintf(r_fp, "%d\t%lf\t%lf\n", index, temp_geo.latitude, temp_geo.longitude);
-  }
-  fclose(geo_fp);
-  fclose(r_fp);
+/*
+* Function: geohash_to_index
+* Generates an index of a geohash relative to a base geo coord.
+* Input:
+*     - base_coords: Base geo coord used for relativety
+*     - geohash: geohash to decode
+* Returns: An index
+*/
+int geohash_to_index(GeoCoord base_coords, char *geohash){
+  GeoCoord t_geo_coords = geohash_decode(geohash);
+  return coords_to_index(base_coords, t_geo_coords);
 }
 
 /*

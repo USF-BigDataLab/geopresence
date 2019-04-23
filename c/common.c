@@ -13,18 +13,21 @@
 
 /*
     Function: struct rbitmap* init_rbitmap()
-    Input: None
+    Input:
+        - base_geohash: Decoded to base geo coord
+        _ base_precision: Length of geohash passed; used for dimensions
     Output: struct rbitmap* - returns a pointer to the new roaring bitmap
 			      that was allocated.
     Description: This function initializes the roaring bitmap by
 		 dynamically allocating all the memory needed.
 		 See common.h for the details of struct rbitmap
 */
-struct rbitmap* init_rbitmap() {
+struct rbitmap* init_rbitmap(char *base_geohash, int base_precision) {
     struct rbitmap* new_rbitmap = malloc(sizeof(struct rbitmap));
     new_rbitmap->rbp = roaring_bitmap_create();
 
-    new_rbitmap->gc = geo_coord_init(new_rbitmap->gc, "AA", 12);
+    new_rbitmap->gc = geohash_decode(base_geohash);
+    new_rbitmap->gc.dimension = geohash_dimensions_for_precision(base_precision);
 
     return new_rbitmap;
 }
