@@ -146,8 +146,20 @@ void buff_insertion_benchmark() {
     // print_results(ITERATION_SZ, cardinality, total_insert_time, total_base_time);
 }
 
-int main() {
+void hashmap_test() {
+  char* test = malloc(sizeof(char) * 100);
+  test = "9x";
+  add_cell(test, 12);
 
+  struct bitmap_hm_data *result = find_cell(test);
+  printf("Printing the value retrieved from the hashmap: %d\n", result->cardinality);
+  //delete_cell(test);
+  unsigned int len = get_hm_length();
+  printf("Printing the length of the hashmap: %u\n", len);
+  print_cells();
+}
+
+int main() {
   printf("\nSTARTING INSERTION BENCHMARK\n");
   FILE *r_fp = fopen("results.txt", "w");
   double avg_insert_time;
@@ -168,11 +180,12 @@ int main() {
     remove(newGeohashFile);
   }
   fclose(r_fp);
+  
 
   // struct rbitmap* test = init_rbitmap();
   // rbitmap_add_all(test, geohashFile, PRECISION);
-
   // buff_insertion_benchmark();
+  // hashmap_test();
 
   return 0;
 }

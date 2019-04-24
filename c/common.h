@@ -7,6 +7,7 @@
 #include "geogrid.h"
 #include "roaring.h"
 #include "geohash.h"
+#include "bitmaphm.h"
 
 /*
     File common.h
@@ -30,6 +31,7 @@
 struct rbitmap {
     GeoCoord gc; //Base geocoord
     roaring_bitmap_t *rbp; //Roaring bit map
+    struct bitmap_hm_data *bm_hm_d; // HashMap for all our cells and cardinality
 };
 
 struct rbitmap* init_rbitmap(char *base_geohash, int base_precision);
