@@ -10,6 +10,7 @@
 void print_gc(GeoCoord gc);
 GeoCoord geo_coord_init(GeoCoord gc, char* base_geo_hash, int precision);
 GeoCoord hash_to_geo(char* base_geo_hash, int precision);
+int geohash_to_index(GeoCoord base_coords, char *geohash);
 //bool addPoint(struct rbitmap* bitmap);
 int xy_to_index(GeoCoord gc);
 int coords_to_index(GeoCoord base_coords, GeoCoord t_coord);

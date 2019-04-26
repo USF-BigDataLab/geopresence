@@ -46,6 +46,41 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
 }
 
 /*
+* Function: read_file
+* Goes through a file of geohashes to create bitmaps of each region.
+* Input:
+*     - file_path: Path to file
+*     - base_prec: Precion for base geo-coordinates struct
+* Returns: -1 if input error; if no erros returns count of geohashes read
+*/
+int read_file(const char *file_path, int base_prec){
+
+  if(base_prec < 1){
+    printf("ERROR: Base precision must be a positive integer\n");
+    return -1;
+  }
+
+  FILE *fp;
+  char buff[255], key[base_prec+1];
+  int index, count = 0;
+  struct rbitmap* bmp = NULL;
+
+  fp = fopen(file_path, "r");
+  while(fgets(buff, 255, (FILE*) fp)){
+    strncpy(key, buff, (sizeof(char)*base_prec));
+
+    //1. If key not in hashmap, assign bmp to new rbitmap
+    //2. If key in hashmap, assign bmp to existing rbitmap
+
+    index = geohash_to_index(bmp->gc, buff);
+    roaring_bitmap_add(bmp->rbp, index);
+    count += 1;
+  }
+  fclose(fp);
+  return count;
+}
+
+/*
     Function: rbitmap_add_all
     Populates bitmap from geohashes converted into indexes from a file.
     Input:
@@ -54,6 +89,7 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
       - precision: Used by GeoCoord to calculate heigh and width
     Returns: Void
 */
+/*
 void rbitmap_add_all(struct rbitmap *bmp, const char *file_path, int precision){
   FILE *fp;
   char buff[255];
@@ -63,13 +99,13 @@ void rbitmap_add_all(struct rbitmap *bmp, const char *file_path, int precision){
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
 
-    //ERROR: Index is not being calculated from base geocoord
-    temp_gc = hash_to_geo(buff, precision);
-    index = xy_to_index(temp_gc);
-    roaring_bitmap_add(bmp->rbp, index);
+    // index = geohash_to_index(bmp.gc, buff)
+    // roaring_bitmap_add(bmp->rbp, index);
   }
   fclose(fp);
 }
+*/
+
 
 /*
     Function: rbitmap_add_all_buff
@@ -82,6 +118,7 @@ void rbitmap_add_all(struct rbitmap *bmp, const char *file_path, int precision){
       - precision: Used by GeoCoord to calculate heigh and width
     Returns: Void
 */
+/*
 void rbitmap_add_all_buff(struct rbitmap *bmp, const char *file_path, int precision){
   FILE *fp;
   char buff[255];
@@ -107,3 +144,4 @@ void rbitmap_add_all_buff(struct rbitmap *bmp, const char *file_path, int precis
 
   fclose(fp);
 }
+*/
