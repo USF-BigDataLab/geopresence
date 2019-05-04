@@ -61,9 +61,13 @@ int read_file(const char *file_path, int base_prec){
   }
 
   FILE *fp;
-  char buff[255], key[base_prec+1];
+  int new_base_prec = base_prec + 1; // Modded because compiler issue
+  char buff[255];
+  char* key = malloc(sizeof(char) * new_base_prec); // array sizes have to be static in C
+  // so you have to malloc the key since you don't the size until run time.
   int index, count = 0;
   struct rbitmap* bmp = NULL;
+  printf("We make it here\n"); // Gets here 
 
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
@@ -75,7 +79,10 @@ int read_file(const char *file_path, int base_prec){
     index = geohash_to_index(bmp->gc, buff);
     roaring_bitmap_add(bmp->rbp, index);
     count += 1;
+    printf("Printing the new data: %s", key); // Trying to print the data
   }
+
+  printf("Ok, so we make it this far\n"); // Doesn't get here, so happens in the loop
   fclose(fp);
   return count;
 }

@@ -6,5 +6,6 @@
 #include "./geogrid.h"
 #include "./geohash.h"
 #include "./roaring.h"
+#include "./bitmaphm.h"
 
 #endif
