@@ -2,6 +2,7 @@
 
 /*
 * File is used to test out parts of code locally. Should avoid pushing to master.
+* Can Make with 'Make sandbox'
 */
 
 void hashmap_test() {
@@ -17,4 +18,9 @@ void hashmap_test() {
   unsigned int len = get_hm_length();
   printf("Printing the length of the hashmap: %u\n", len);
   print_cells();
+}
+
+int main() {
+  hashmap_test();
+  return 0;
 }
