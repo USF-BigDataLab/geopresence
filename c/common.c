@@ -51,9 +51,9 @@ void free_rbitmap(struct rbitmap* f_rbitmap) {
 * Input:
 *     - file_path: Path to file
 *     - base_prec: Precion for base geo-coordinates struct
-* Returns: -1 if input error; if no erros returns count of geohashes read
+* Returns: -1 if input error; if no errors returns count of geohashes read
 */
-int read_file(const char *file_path, int base_prec){
+int read_file(const char *file_path, const int base_prec){
 
   if(base_prec < 1){
     printf("ERROR: Base precision must be a positive integer\n");
@@ -61,28 +61,36 @@ int read_file(const char *file_path, int base_prec){
   }
 
   FILE *fp;
-  int new_base_prec = base_prec + 1; // Modded because compiler issue
+  char key[base_prec + 1];
   char buff[255];
-  char* key = malloc(sizeof(char) * new_base_prec); // array sizes have to be static in C
-  // so you have to malloc the key since you don't the size until run time.
+
   int index, count = 0;
   struct rbitmap* bmp = NULL;
-  printf("We make it here\n"); // Gets here 
 
   fp = fopen(file_path, "r");
   while(fgets(buff, 255, (FILE*) fp)){
-    strncpy(key, buff, (sizeof(char)*base_prec));
+    strncpy(key, buff, base_prec);
+    printf("Checking if %s is in hashmap ...\n", key);
 
-    //1. If key not in hashmap, assign bmp to new rbitmap
-    //2. If key in hashmap, assign bmp to existing rbitmap
+    struct bitmap_hm_data *cell = find_cell(key);
+    if(cell == NULL){
+      printf("Not in hashmap, creating a new bitmap\n");
+
+      struct rbitmap *bmp = init_rbitmap(key, base_prec);
+      add_cell(key, bmp);
+    }
+    else {
+      printf("In hashmap, updating bitmap\n");
+      bmp = cell->bmap;
+    }
 
     index = geohash_to_index(bmp->gc, buff);
     roaring_bitmap_add(bmp->rbp, index);
     count += 1;
-    printf("Printing the new data: %s", key); // Trying to print the data
   }
+  printf("Length of hashmap: %u\n", get_hm_length());
+  // print_cells();
 
-  printf("Ok, so we make it this far\n"); // Doesn't get here, so happens in the loop
   fclose(fp);
   return count;
 }

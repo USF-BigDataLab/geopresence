@@ -36,7 +36,7 @@ struct rbitmap {
 
 struct rbitmap* init_rbitmap(char *base_geohash, int base_precision);
 void free_rbitmap(struct rbitmap* f_rbitmap);
-int read_file(const char *file_path, int base_prec);
+int read_file(const char *file_path, const int base_prec);
 
 void rbitmap_add_all(struct rbitmap *bitmap, const char *file_path, int precision);
 void rbitmap_add_all_buff(struct rbitmap *bmp, const char *file_path, int precision);
