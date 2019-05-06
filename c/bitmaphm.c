@@ -68,12 +68,16 @@ unsigned int get_hm_length(){
     Input: None
     Output: None
     Purpose: This function is for printing all the data in the hashmap
-    This only prints the bitmap_cell; it doesn't print the struct data. 
+    This only prints the bitmap_cell; it doesn't print the struct data.
 */
 void print_cells() {
     struct bitmap_hm_data *entry;
-
+    int total_card = 0;
     for (entry = g_bm_hm_data; entry != NULL; entry = entry->hh.next) {
-        printf("Cell: %s", entry->bitmap_cell);
+        printf("Cell: %s\n", entry->bitmap_cell);
+        int cur_card = roaring_bitmap_get_cardinality(entry->bmap->rbp);
+        total_card += cur_card;
+        printf("Bitmap cardinality: %d\n", cur_card);
     }
+    printf("Total card: %d\n", total_card);
 }

@@ -61,35 +61,32 @@ int read_file(const char *file_path, const int base_prec){
   }
 
   FILE *fp;
-  char key[base_prec + 1];
-  char buff[255];
-
+  const int buff_sz = 255;
+  char base_geohash[base_prec + 1], buff[buff_sz];
   int index, count = 0;
-  struct rbitmap* bmp = NULL;
+  struct rbitmap* rbmp = NULL;
 
   fp = fopen(file_path, "r");
-  while(fgets(buff, 255, (FILE*) fp)){
-    strncpy(key, buff, base_prec);
-    printf("Checking if %s is in hashmap ...\n", key);
+  while(fgets(buff, buff_sz, (FILE*) fp)){
+    strncpy(base_geohash, buff, base_prec);
+    // printf("Checking if %s is in hashmap ...\n", base_geohash);
 
-    struct bitmap_hm_data *cell = find_cell(key);
+    struct bitmap_hm_data *cell = find_cell(base_geohash);
     if(cell == NULL){
-      printf("Not in hashmap, creating a new bitmap\n");
+      // printf("Not in hashmap, creating a new bitmap\n");
 
-      struct rbitmap *bmp = init_rbitmap(key, base_prec);
-      add_cell(key, bmp);
+      rbmp = init_rbitmap(base_geohash, base_prec);
+      add_cell(base_geohash, rbmp);
     }
     else {
-      printf("In hashmap, updating bitmap\n");
-      bmp = cell->bmap;
+      // printf("In hashmap, updating bitmap\n");
+      rbmp = cell->bmap;
     }
 
-    index = geohash_to_index(bmp->gc, buff);
-    roaring_bitmap_add(bmp->rbp, index);
+    index = geohash_to_index(rbmp->gc, buff);
+    roaring_bitmap_add(rbmp->rbp, index);
     count += 1;
   }
-  printf("Length of hashmap: %u\n", get_hm_length());
-  // print_cells();
 
   fclose(fp);
   return count;
