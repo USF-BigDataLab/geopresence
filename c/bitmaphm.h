@@ -9,7 +9,7 @@
 struct bitmap_hm_data {
     char* bitmap_cell; // This is the key for the bitmap; it's using the first two chars from the given hash
     struct rbitmap* bmap;
-    UT_hash_handle hh; // makes this struct hashable 
+    UT_hash_handle hh; // makes this struct hashable
 };
 
 void add_cell(char* cell, struct rbitmap* bm);
@@ -17,4 +17,6 @@ struct bitmap_hm_data *find_cell(char* cell);
 void delete_cell(char* cell);
 unsigned int get_hm_length();
 void print_cells();
+void print_total_cardinality();
+void free_hm();
 #endif

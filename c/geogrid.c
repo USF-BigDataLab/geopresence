@@ -160,7 +160,10 @@ void coords_to_xy(GeoCoord base_coords, GeoCoord coords, int *x, int *y){
 int coords_to_index(GeoCoord base_coords, GeoCoord t_coord){
   float x_diff = t_coord.longitude - base_coords.west;
   float y_diff = t_coord.latitude - base_coords.south;
-  float width = base_coords.dimension.width * base_coords.dimension.height;
+
+  // NOTE: Hard coding multiplier for now, but should be adjusted depending on precision
+  // if precision is 3, use 1000000
+  float width = base_coords.dimension.width * base_coords.dimension.height * 1000000;
 
   return (int) (y_diff * width) + x_diff; //algorithm to convert 2D to 1D
 }

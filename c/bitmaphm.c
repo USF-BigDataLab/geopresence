@@ -47,7 +47,7 @@ struct bitmap_hm_data *find_cell(char* cell) {
 void delete_cell(char* cell) {
     struct bitmap_hm_data *entry = find_cell(cell);
     HASH_DEL(g_bm_hm_data, entry);
-    printf("The data at cell %s has been deleted and will be freed\n", cell);
+    free_rbitmap(entry->bmap);
     free(entry); // might need to be careful about where we free this data
 }
 
@@ -80,4 +80,24 @@ void print_cells() {
         printf("Bitmap cardinality: %d\n", cur_card);
     }
     printf("Total card: %d\n", total_card);
+}
+
+void print_total_cardinality(){
+  struct bitmap_hm_data *entry;
+  int total_card = 0;
+  for (entry = g_bm_hm_data; entry != NULL; entry = entry->hh.next) {
+      int cur_card = roaring_bitmap_get_cardinality(entry->bmap->rbp);
+      total_card += cur_card;
+  }
+  printf("Total card: %d\n", total_card);
+}
+
+void free_hm(){
+  struct bitmap_hm_data *entry, *next_entry;
+  for (entry = g_bm_hm_data; entry != NULL; entry = entry->hh.next) {
+    next_entry = entry->hh.next; // save pointer to next entry
+    delete_cell(entry->bitmap_cell);
+  }
+
+  g_bm_hm_data = NULL;
 }

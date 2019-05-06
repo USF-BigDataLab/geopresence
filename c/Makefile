@@ -13,8 +13,6 @@ all: geo
 
 insrt_bnch: insrt_bnch_tst
 
-s_box: s_box
-
 geo: $(driver_obj)
 	$(CC) $(CFLAGS) $(driver_obj) -o $@
 

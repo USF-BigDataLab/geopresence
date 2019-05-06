@@ -29,6 +29,13 @@ struct rbitmap* init_rbitmap(char *base_geohash, int base_precision) {
     new_rbitmap->gc = geohash_decode(base_geohash);
     new_rbitmap->gc.dimension = geohash_dimensions_for_precision(base_precision);
 
+    // printf("Print from common.c\n");
+    // printf("base_prec: %d\n", base_precision);
+    // printf("gc coords info:\n");
+    // printf("Lat: %f \nLon: %f\n", new_rbitmap->gc.latitude, new_rbitmap->gc.longitude);
+    // printf("North: %f \nSouth: %f \nWest: %f \nEast: %f\n", new_rbitmap->gc.north, new_rbitmap->gc.south, new_rbitmap->gc.west, new_rbitmap->gc.east);
+    // printf("width: %f \nHeight: %f\n", new_rbitmap->gc.dimension.width, new_rbitmap->gc.dimension.height);
+
     return new_rbitmap;
 }
 
@@ -40,8 +47,7 @@ struct rbitmap* init_rbitmap(char *base_geohash, int base_precision) {
 		 to the function.
 */
 void free_rbitmap(struct rbitmap* f_rbitmap) {
-    //free(f_rbitmap->gc);
-    free(f_rbitmap->rbp);
+    roaring_bitmap_free(f_rbitmap->rbp);
     free(f_rbitmap);
 }
 
@@ -73,13 +79,10 @@ int read_file(const char *file_path, const int base_prec){
 
     struct bitmap_hm_data *cell = find_cell(base_geohash);
     if(cell == NULL){
-      // printf("Not in hashmap, creating a new bitmap\n");
-
       rbmp = init_rbitmap(base_geohash, base_prec);
       add_cell(base_geohash, rbmp);
     }
     else {
-      // printf("In hashmap, updating bitmap\n");
       rbmp = cell->bmap;
     }
 
