@@ -13,7 +13,7 @@ public class Driver {
     int iterations = 0; // current number of iterations through the data set. It's worth noting that
     // this variable is also used to index through the runTimes and memoryUsage arrays; this is done because
     // each index of the runTimes and memoryUsage arrays refers to a specific iteration.
-    int iterationSize = 5; // number of times the data set should be iterated through
+    int iterationSize = 1; // number of times the data set should be iterated through
     private Map<String, GeoavailabilityGrid> grids = new HashMap<>();
 
     public void Driver() { }
@@ -29,7 +29,7 @@ public class Driver {
             if (gg == null) {
                 grids.put(
                         prefix,
-                        new GeoavailabilityGrid(prefix, 10)
+                        new GeoavailabilityGrid(prefix, 16)
                 );
                 gg = grids.get(prefix);
             }
@@ -88,7 +88,7 @@ public class Driver {
                 while (line != null && dataCounter < dataSize) {
                     /* Get the first character in the string. We'll create a GeoGrid for
                      * each unique character to split things up. */
-                    String prefix = line.substring(0, 1);
+                    String prefix = line.substring(0, 2);
                     GeoavailabilityGrid gg = grids.get(prefix);
                     if (gg == null) {
                         grids.put(
@@ -140,6 +140,7 @@ public class Driver {
             long allIterationTime = endTime - startTime;
             long allIterationTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(allIterationTime);
 
+            System.out.println("-> " + grids.size());
             System.out.println("RESULTS");
             System.out.println("-----------");
             System.out.println("Average run time:  " + runTimeAverage + " milliseconds");
