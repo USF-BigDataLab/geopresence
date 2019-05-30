@@ -54,6 +54,7 @@ typedef struct IntervalStruct {
     
 } Interval;
 
+static char better_map[128];
 
 /* Normal 32 characer map used for geohashing */
 static char char_map[32] =  "0123456789bcdefghjkmnpqrstuvwxyz";
@@ -93,6 +94,13 @@ unsigned int index_for_char(char c, char *string) {
     }
     
     return index;
+}
+
+void geo_init_map(void) {
+    int i;
+    for(i = 0; i < strlen(char_map); i++) {
+        better_map[(int) char_map[i]] = i;
+    }
 }
 
 char* get_neighbor(char *hash, int direction) {
@@ -206,7 +214,7 @@ GeoCoord geohash_decode(char *hash) {
             int i, j;
             for(i = 0; i < char_amount; i++) {
             
-                char_mapIndex = index_for_char(hash[i], (char*)char_map);
+                char_mapIndex = better_map[hash[i]];
                 
                 if(char_mapIndex < 0)
                     break;

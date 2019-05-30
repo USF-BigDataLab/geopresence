@@ -79,4 +79,6 @@ extern char** geohash_neighbors(char* hash);
  */
 extern GeoBoxDimension geohash_dimensions_for_precision(int precision);
 
+void geo_init_map(void);
+
 #endif
