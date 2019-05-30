@@ -93,7 +93,7 @@ public class Driver {
                     if (gg == null) {
                         grids.put(
                                 prefix,
-                                new GeoavailabilityGrid(prefix, 10)
+                                new GeoavailabilityGrid(prefix, 16)
                         );
                         gg = grids.get(prefix);
                     }
