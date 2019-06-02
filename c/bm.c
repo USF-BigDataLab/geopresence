@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 
+#include "log.h"
 #include "roaring.c"
 #include "uthash-master/src/uthash.h"
 #include "geohash.h"
@@ -55,7 +56,12 @@ struct geode *geode_create(char *geohash)
     g->x_px = g->x_deg / (double) g->width;
     g->y_px = g->y_deg / (double) g->width;
 
-    //printf("New geohash: %s\n", geohash);
+    LOG("New GEODE: %s (%d x %d), dpp: (%f, %f)\n",
+            g->prefix,
+            g->width,
+            g->height,
+            g->x_px,
+            g->y_px);
 
     return g;
 }
@@ -77,7 +83,7 @@ int geode_xy_to_index(struct geode *g, int x, int y) {
 
 void print_geocoord(GeoCoord *gc)
 {
-    //printf("(%f, %f) in [%f, %f, %f, %f]\n", gc->longitude, gc->latitude, gc->north, gc->east, gc->south, gc->west);
+    printf("(%f, %f) in [%f, %f, %f, %f]\n", gc->longitude, gc->latitude, gc->north, gc->east, gc->south, gc->west);
 }
 
 /**
@@ -94,20 +100,14 @@ unsigned int geode_coords_to_idx(struct geode *g, GeoCoord *gc) {
      * will decrease as y increases, and longitude will increase as x
      * increases. This is reflected in how we compute the differences
      * between the base points and the coordinates in question. */
-    //printf("long: %f, west: %f\n", gc->longitude, g->base_geohash.west);
     float xDiff = fabs(gc->longitude - g->base_geohash.west);
     float yDiff = fabs(gc->latitude - g->base_geohash.north);
-        
 
     int x = (int) (xDiff / g->x_px);
     int y = (int) (yDiff / g->y_px);
 
-    //printf("%f %f (%f | %f) -- %d %d\n", xDiff, yDiff, g->x_deg, g->y_deg, x, y);
-
     return y * g->width + x;
 }
-
-
 
 int main(void)
 {
@@ -129,9 +129,8 @@ int main(void)
         }
 
         GeoCoord gc = geohash_decode(line);
-        print_geocoord(&gc);
+        //print_geocoord(&gc);
         unsigned int idx = geode_coords_to_idx(instance, &gc);
-        //printf("adding index %u for geohash %s\n", idx, line);
         roaring_bitmap_add(instance->bmp, idx);
 
     }
