@@ -64,3 +64,8 @@ How to integrate into query pipeline? Use point-in-polygon algorithm to determin
 
 ## Task 3: OpenStreetMap Data
 
+The case study here will be using OSM data to compare against the plain old gridded NOAA data. We should be able to achieve much better query performance compared to GeoGrids because we can distinguish density. (See: SF vs Reno)
+
+## Task 4: Paper
+
+...
