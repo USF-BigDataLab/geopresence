@@ -3,31 +3,17 @@
 #include <stdio.h>
 
 #include "log.h"
+#include "geode.h"
 #include "roaring.c"
 #include "uthash.h"
 #include "geohash.h"
 
-#define PREFIX_SZ 2
 #define PRECISION 16
 
-
-struct geode {
-    char prefix[PREFIX_SZ + 1];
-    GeoCoord base_geohash;
-    unsigned int width;
-    unsigned int height;
-    double x_deg;
-    double y_deg;
-    double x_px;
-    double y_px;
-    roaring_bitmap_t *bmp;
-    UT_hash_handle hh;
-};
-
-struct geode *geode_create(char *geohash)
+struct geode *geode_create(char *base_geohash, unsigned int precision)
 {
     struct geode *g = malloc(sizeof(struct geode));
-    strncpy(g->prefix, geohash, PREFIX_SZ);
+    strncpy(g->prefix, base_geohash, PREFIX_SZ);
     g->prefix[PREFIX_SZ] = '\0';
     g->bmp = roaring_bitmap_create();
 
@@ -38,9 +24,9 @@ struct geode *geode_create(char *geohash)
      * width = 2^(floor(precision / 2))
      * height = 2^(ceil(precision / 2))
      */
-    int w = PRECISION / 2;
-    int h = PRECISION / 2;
-    if (PRECISION % 2 != 0) {
+    int w = precision / 2;
+    int h = precision / 2;
+    if (precision % 2 != 0) {
         h += 1;
     }
 
@@ -124,7 +110,7 @@ int main(void)
         struct geode *instance;
         HASH_FIND_STR(instances, prefix, instance);
         if (instance == NULL) {
-            instance = geode_create(line);
+            instance = geode_create(line, 16);
             HASH_ADD_STR(instances, prefix, instance);
         }
 
