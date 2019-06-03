@@ -214,7 +214,7 @@ GeoCoord geohash_decode(char *hash) {
             int i, j;
             for(i = 0; i < char_amount; i++) {
             
-                char_mapIndex = better_map[hash[i]];
+                char_mapIndex = better_map[(int) hash[i]];
                 
                 if(char_mapIndex < 0)
                     break;
