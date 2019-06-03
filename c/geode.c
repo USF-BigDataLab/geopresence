@@ -13,7 +13,12 @@
 struct geode *geode_create(char *base_geohash, unsigned int precision)
 {
     struct geode *g = malloc(sizeof(struct geode));
-    strncpy(g->prefix, base_geohash, PREFIX_SZ);
+    if (g == NULL) {
+        perror("malloc");
+        return NULL;
+    }
+
+    memcpy(g->prefix, base_geohash, PREFIX_SZ);
     g->prefix[PREFIX_SZ] = '\0';
     g->bmp = roaring_bitmap_create();
 
@@ -104,8 +109,8 @@ int main(void)
     char line[128];
     while(fgets(line, 128, fp) != NULL) {
 //        strcpy(line, "9xbpb");
-        char prefix[PREFIX_SZ + 1];
-        strncpy(prefix, line, PREFIX_SZ);
+        char prefix[PREFIX_SZ + 1] = { '\0' };
+        memcpy(prefix, line, PREFIX_SZ);
 
         struct geode *instance;
         HASH_FIND_STR(instances, prefix, instance);
