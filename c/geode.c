@@ -4,7 +4,7 @@
 
 #include "log.h"
 #include "roaring.c"
-#include "uthash-master/src/uthash.h"
+#include "uthash.h"
 #include "geohash.h"
 
 #define PREFIX_SZ 2
