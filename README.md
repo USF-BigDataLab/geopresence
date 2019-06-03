@@ -54,5 +54,13 @@ Since we're targeting IoT deployments, we will test on a Raspberry Pi.
 
 Evaluate [Count Min](https://en.wikipedia.org/wiki/Count–min_sketch) and [HyperLogLog++](https://en.wikipedia.org/wiki/HyperLogLog) for estimating the amount of points stored in each grid cell.
 
+After a warm-up period, if a particular point has a disproportionate amount of unique values then it should be split off into its own bitmap.
+
+How to determine "disproportionate?"
+* Coefficient of variation
+* One or two std devs from mean?
+
+How to integrate into query pipeline? Use point-in-polygon algorithm to determine if the sub-bitmap should be checked?
+
 ## Task 3: OpenStreetMap Data
 
