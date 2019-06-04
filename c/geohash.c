@@ -33,6 +33,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+/* -- */
+#define BITS_PER_CHAR 5
+#define LAT_RANGE 90
+#define LON_RANGE 180
+/* -- */
 
 #define MAX_LAT             90.0
 #define MIN_LAT             -90.0
@@ -54,10 +61,25 @@ typedef struct IntervalStruct {
     
 } Interval;
 
-static char better_map[128];
-
 /* Normal 32 characer map used for geohashing */
 static char char_map[32] =  "0123456789bcdefghjkmnpqrstuvwxyz";
+
+static char char_lut[128] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1,  0,  1,
+     2,  3,  4,  5,  6,  7,  8,  9, -1, -1,
+    -1, -1, -1, -1, -1, -1, 10, 11, 12, 13,
+    14, 15, 16, -1, 17, 18, -1, 19, 20, -1,
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+    31, -1, -1, -1, -1, -1, -1, -1, 10, 11,
+    12, 13, 14, 15, 16, -1, 17, 18, -1, 19,
+    20, -1, 21, 22, 23, 24, 25, 26, 27, 28,
+    29, 30, 31, -1, -1, -1, -1, -1,
+};
+
 
 /*
  *  The follow character maps were created by Dave Troy and used in his Javascript Geohashing
@@ -94,13 +116,6 @@ unsigned int index_for_char(char c, char *string) {
     }
     
     return index;
-}
-
-void geo_init_map(void) {
-    int i;
-    for(i = 0; i < strlen(char_map); i++) {
-        better_map[(int) char_map[i]] = i;
-    }
 }
 
 char* get_neighbor(char *hash, int direction) {
@@ -214,7 +229,7 @@ GeoCoord geohash_decode(char *hash) {
             int i, j;
             for(i = 0; i < char_amount; i++) {
             
-                char_mapIndex = better_map[(int) hash[i]];
+                char_mapIndex = index_for_char(hash[i], (char *) char_map);
                 
                 if(char_mapIndex < 0)
                     break;
@@ -248,6 +263,56 @@ GeoCoord geohash_decode(char *hash) {
     
     return coordinate;
 }
+
+int geohash_decodeN(struct spatial_range *bbox, const char *hash) {
+
+    bbox->north =  LAT_RANGE;
+    bbox->south = -LAT_RANGE;
+    bbox->east  =  LON_RANGE;
+    bbox->west  = -LON_RANGE;
+
+    const char *curr_char = hash;
+    bool north_south = false;
+
+    while (*curr_char != '\0') {
+
+        char bits = char_lut[(int) *curr_char];
+        if (bits < 0) {
+            /* lookup failed */
+            return -1;
+        }
+
+        /* start at the leftmost bit, shift right one bit per iteration */
+        int i;
+        for (i = 0x10; i > 0; i >>= 1) {
+            double *hi, *lo, mid;
+
+            if (north_south) {
+                hi = &bbox->north;
+                lo = &bbox->south;
+            } else {
+                hi = &bbox->east;
+                lo = &bbox->west;
+            }
+
+            mid = (*hi - *lo) / 2.0;
+            if ((bits & i) == i) {
+                *lo += mid;
+            } else {
+                *hi -= mid;
+            }
+
+            north_south = !north_south;
+        }
+
+        bbox->latitude  = bbox->north - ((bbox->north - bbox->south) / 2.0);
+        bbox->longitude = bbox->west - ((bbox->west - bbox->east) / 2.0);
+        curr_char++;
+    }
+
+    return 0;
+}
+
 
 
 char** geohash_neighbors(char *hash) {

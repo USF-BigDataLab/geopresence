@@ -49,9 +49,20 @@ typedef struct GeoCoordStruct {
     double south;
     double west;
 
-	GeoBoxDimension dimension;
     
 } GeoCoord;
+
+struct spatial_range {
+    double north;
+    double east;
+    double south;
+    double west;
+
+    double longitude;
+    double latitude;
+};
+
+int geohash_decodeN(struct spatial_range *bbox, const char *hash);
 
 /*
  * Creates a the hash at the specified precision. If precision is set to 0.
