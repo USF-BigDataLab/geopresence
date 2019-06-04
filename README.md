@@ -39,9 +39,33 @@ Since we're targeting IoT deployments, we will test on a Raspberry Pi.
 * Memory consumption: use valgrind / visualvm to record mem usage. How many records can we store on a single Pi?
 * Varying insertion sizes: the Java implementation stores incoming points in a sorted map and then inserts them before servicing a query. This helps avoid issues with out-of-order insertions with EWAH. However, Roaring Bitmaps have no such limitation so we can insert a single point at a time or several. For this benchmark, we will vary the insertion size and measure speed (it is likely faster to insert many points at once, but there should be a point of diminishing returns)
 
+### Benchmark Status
+- [ ] Single-pass data load timing on orion
+- [ ] Double-pass data load timing on orion
+- [ ] Single-pass data load timing on RPi 3
+- [ ] Double-pass data load timing on RPi 3
+- [ ] OpenJDK vs Oracle JDK comparison on the RPi
+- [ ] Single-pass memory consumption
+- [ ] Double-pass memory consumption
+- [ ] Batched insertion benchmark
+- [ ] Random insertion benchmark
+
 ## Task 2: Probabilistic Point Density Estimation
 
 Evaluate [Count Min](https://en.wikipedia.org/wiki/Count–min_sketch) and [HyperLogLog++](https://en.wikipedia.org/wiki/HyperLogLog) for estimating the amount of points stored in each grid cell.
 
+After a warm-up period, if a particular point has a disproportionate amount of unique values then it should be split off into its own bitmap.
+
+How to determine "disproportionate?"
+* Coefficient of variation
+* One or two std devs from mean?
+
+How to integrate into query pipeline? Use point-in-polygon algorithm to determine if the sub-bitmap should be checked?
+
 ## Task 3: OpenStreetMap Data
 
+The case study here will be using OSM data to compare against the plain old gridded NOAA data. We should be able to achieve much better query performance compared to GeoGrids because we can distinguish density. (See: SF vs Reno)
+
+## Task 4: Paper
+
+...
