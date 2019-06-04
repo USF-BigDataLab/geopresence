@@ -9,7 +9,7 @@
 
 struct geode {
     char prefix[PREFIX_SZ + 1];
-    GeoCoord base_geohash;
+    struct spatial_range base_range;
     unsigned int width;
     unsigned int height;
     double x_deg;
@@ -19,6 +19,8 @@ struct geode {
     roaring_bitmap_t *bmp;
     UT_hash_handle hh;
 };
+
+unsigned int geode_coords_to_idx(struct geode *g, struct spatial_range *sr);
 
 /**
  * Initializes a new GEODE data structure using the provided base Geohash.

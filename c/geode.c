@@ -1,4 +1,3 @@
-
 #include <math.h>
 #include <stdio.h>
 
@@ -7,8 +6,6 @@
 #include "roaring.c"
 #include "uthash.h"
 #include "geohash.h"
-
-#define PRECISION 16
 
 struct geode *geode_create(char *base_geohash, unsigned int precision)
 {
@@ -22,7 +19,7 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
     g->prefix[PREFIX_SZ] = '\0';
     g->bmp = roaring_bitmap_create();
 
-    g->base_geohash = geohash_decode(g->prefix);
+    geohash_decodeN(&g->base_range, g->prefix);
 
     /*
      * height, width calculated like so:
@@ -40,8 +37,8 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
 
     /* Determine the number of degrees in the x and y directions for the
      * base spatial range this geoavailability grid represents */
-    g->x_deg = fabs(g->base_geohash.west - g->base_geohash.east);
-    g->y_deg = fabs(g->base_geohash.north - g->base_geohash.south);
+    g->x_deg = fabs(g->base_range.west - g->base_range.east);
+    g->y_deg = fabs(g->base_range.north - g->base_range.south);
 
     /* Determine the number of degrees represented by each grid pixel */
     g->x_px = g->x_deg / (double) g->width;
@@ -85,14 +82,14 @@ void print_geocoord(GeoCoord *gc)
  *
  * @return Corresponding x, y location in the grid.
  */
-unsigned int geode_coords_to_idx(struct geode *g, GeoCoord *gc) {
+unsigned int geode_coords_to_idx(struct geode *g, struct spatial_range *sr) {
 
     /* Assuming (x, y) coordinates for the geoavailability grids, latitude
      * will decrease as y increases, and longitude will increase as x
      * increases. This is reflected in how we compute the differences
      * between the base points and the coordinates in question. */
-    float xDiff = fabs(gc->longitude - g->base_geohash.west);
-    float yDiff = fabs(gc->latitude - g->base_geohash.north);
+    float xDiff = fabs(sr->longitude - g->base_range.west);
+    float yDiff = fabs(sr->latitude - g->base_range.north);
 
     int x = (int) (xDiff / g->x_px);
     int y = (int) (yDiff / g->y_px);
@@ -100,35 +97,8 @@ unsigned int geode_coords_to_idx(struct geode *g, GeoCoord *gc) {
     return y * g->width + x;
 }
 
-int main(void)
-{
-    geo_init_map();
-    FILE *fp = fopen("../datasets/geohashes.txt", "r");
-    struct geode *instances = NULL;
-
-    char line[128];
-    while(fgets(line, 128, fp) != NULL) {
-//        strcpy(line, "9xbpb");
-        char prefix[PREFIX_SZ + 1] = { '\0' };
-        memcpy(prefix, line, PREFIX_SZ);
-
-        struct geode *instance;
-        HASH_FIND_STR(instances, prefix, instance);
-        if (instance == NULL) {
-            instance = geode_create(line, 16);
-            HASH_ADD_STR(instances, prefix, instance);
-        }
-
-        GeoCoord gc = geohash_decode(line);
-        //print_geocoord(&gc);
-        unsigned int idx = geode_coords_to_idx(instance, &gc);
-        roaring_bitmap_add(instance->bmp, idx);
-
-    }
-
 //    struct geode *inst;
 //    for (inst = instances; inst != NULL; inst = inst->hh.next) {
 //        uint32_t c = roaring_bitmap_get_cardinality(inst->bmp);
 //        printf("-> %s %d\n", inst->prefix, c);
 //    }
-}
