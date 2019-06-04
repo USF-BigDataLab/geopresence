@@ -22,7 +22,7 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
     geohash_decodeN(&g->base_range, g->prefix);
 
     /*
-     * height, width calculated like so:
+     * height, width calculation:
      * width = 2^(floor(precision / 2))
      * height = 2^(ceil(precision / 2))
      */
@@ -35,8 +35,8 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
     g->width = (1 << w); /* = 2^w */
     g->height = (1 << h); /* = 2^h */
 
-    /* Determine the number of degrees in the x and y directions for the
-     * base spatial range this geoavailability grid represents */
+    /* Determine the number of degrees in the x and y directions for the base
+     * spatial range this GEODE represents */
     g->x_deg = fabs(g->base_range.west - g->base_range.east);
     g->y_deg = fabs(g->base_range.north - g->base_range.south);
 
