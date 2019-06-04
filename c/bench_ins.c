@@ -10,7 +10,7 @@ int main(void)
 
     char line[128];
     double start = timer_now();
-    while(fgets(line, 128, fp) != NULL) {
+    while (fgets(line, 128, fp) != NULL) {
         char prefix[PREFIX_SZ + 1] = { '\0' };
         memcpy(prefix, line, PREFIX_SZ);
 
@@ -24,6 +24,7 @@ int main(void)
         struct spatial_range sr;
         geohash_decodeN(&sr, line);
 
+        /* TODO: this should be done in a function, probably geode_add() */
         unsigned int idx = geode_coords_to_idx(instance, &sr);
         roaring_bitmap_add(instance->bmp, idx);
     }
