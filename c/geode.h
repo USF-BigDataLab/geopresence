@@ -21,6 +21,7 @@ struct geode {
 };
 
 unsigned int geode_coords_to_idx(struct geode *g, struct spatial_range *sr);
+void geode_add_geohash(struct geode *g, const char *geohash);
 void geode_add_sprange(struct geode *g, const struct spatial_range *sr);
 
 /**
