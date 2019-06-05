@@ -7,7 +7,7 @@
 
 int main(void)
 {
-    struct geode *g = geode_create("9x", 20);
+    struct geode *g = geode_create("9x", TEST_PRECISION);
 
     double start = timer_now();
     for (int i = 0; i < 10000000; ++i) {
