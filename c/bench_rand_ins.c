@@ -13,10 +13,7 @@ int main(void)
     for (int i = 0; i < 10000000; ++i) {
         int rand_x = (rand() / ((double) RAND_MAX + 1)) * (g->width + 1);
         int rand_y = (rand() / ((double) RAND_MAX + 1)) * (g->height + 1);
-
-        /* TODO: this should be done in a function, probably geode_add() */
-        unsigned int idx =  rand_y * g->width + rand_x;
-        roaring_bitmap_add(g->bmp, idx);
+        geode_add_xy(g, rand_x, rand_y);
     }
     double end = timer_now();
     printf("%f\n", end - start);
