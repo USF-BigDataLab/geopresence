@@ -78,7 +78,8 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
  * @return A single integer representing the bitmap location of the X, Y
  * coordinates.
  */
-int geode_xy_to_index(struct geode *g, int x, int y) {
+int geode_xy_to_idx(struct geode *g, const int x, const int y)
+{
     return y * g->width + x;
 }
 
@@ -95,7 +96,9 @@ void print_geocoord(GeoCoord *gc)
  *
  * @return Corresponding x, y location in the grid.
  */
-unsigned int geode_coords_to_idx(struct geode *g, struct spatial_range *sr) {
+unsigned int geode_sprange_to_idx(
+        struct geode *g, const struct spatial_range *sr)
+{
 
     /* Assuming (x, y) coordinates for the geoavailability grids, latitude
      * will decrease as y increases, and longitude will increase as x
@@ -104,10 +107,10 @@ unsigned int geode_coords_to_idx(struct geode *g, struct spatial_range *sr) {
     float xDiff = fabs(sr->longitude - g->base_range.west);
     float yDiff = fabs(sr->latitude - g->base_range.north);
 
-    int x = (int) (xDiff / g->x_px);
-    int y = (int) (yDiff / g->y_px);
+    const int x = (int) (xDiff / g->x_px);
+    const int y = (int) (yDiff / g->y_px);
 
-    return y * g->width + x;
+    return geode_xy_to_idx(g, x, y);
 }
 
 //    struct geode *inst;
