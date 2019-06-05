@@ -7,6 +7,12 @@
 #include "uthash.h"
 #include "geohash.h"
 
+void geode_add_sprange(struct geode *g, const struct spatial_range *sr)
+{
+    unsigned int idx = geode_sprange_to_idx(g, sr);
+    roaring_bitmap_add(g->bmp, idx);
+}
+
 struct geode *geode_create(char *base_geohash, unsigned int precision)
 {
     struct geode *g = malloc(sizeof(struct geode));
