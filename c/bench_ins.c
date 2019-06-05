@@ -21,12 +21,7 @@ int main(void)
             HASH_ADD_STR(instances, prefix, instance);
         }
 
-        struct spatial_range sr;
-        geohash_decodeN(&sr, line);
-
-        /* TODO: this should be done in a function, probably geode_add() */
-        unsigned int idx = geode_coords_to_idx(instance, &sr);
-        roaring_bitmap_add(instance->bmp, idx);
+        geode_add_geohash(instance, line);
     }
     double end = timer_now();
     printf("%f\n", end - start);
