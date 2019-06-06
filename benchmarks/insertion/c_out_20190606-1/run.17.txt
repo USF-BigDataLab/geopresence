@@ -1,0 +1,101 @@
+geode.c:72:geode_create(): New GEODE: 8g (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 8u (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 8v (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 8x (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 8y (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 8z (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 94 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 95 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 96 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 97 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9d (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9e (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9g (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9h (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9j (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9k (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9m (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9n (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9p (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9q (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9r (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9s (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9t (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9u (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9v (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9w (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9x (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9y (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: 9z (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: b8 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: b9 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: bb (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: bc (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: bf (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c0 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c1 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c2 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c3 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c4 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c6 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c8 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: c9 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: cb (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: cc (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: cd (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: cf (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: d4 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: d5 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: d6 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: d7 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dd (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: de (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dh (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dj (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dk (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dm (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dn (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dp (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dq (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dr (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: ds (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dt (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dw (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dx (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: dz (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f0 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f1 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f2 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f3 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f4 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f6 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f8 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: f9 (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: fb (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: fc (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: fd (256 x 256), dpp: (0.043945, 0.021973)
+geode.c:72:geode_create(): New GEODE: ff (256 x 256), dpp: (0.043945, 0.021973)
+0.757865
+	Command being timed: "./bench_ins"
+	User time (seconds): 0.74
+	System time (seconds): 0.00
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.75
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1780
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 191
+	Voluntary context switches: 0
+	Involuntary context switches: 46
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 16
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
