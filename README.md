@@ -40,8 +40,13 @@ Since we're targeting IoT deployments, we will test on a Raspberry Pi.
 * Varying insertion sizes: the Java implementation stores incoming points in a sorted map and then inserts them before servicing a query. This helps avoid issues with out-of-order insertions with EWAH. However, Roaring Bitmaps have no such limitation so we can insert a single point at a time or several. For this benchmark, we will vary the insertion size and measure speed (it is likely faster to insert many points at once, but there should be a point of diminishing returns)
 
 ### Benchmark Status
-- [ ] Single-pass data load timing on orion
-- [ ] Double-pass data load timing on orion
+
+Implementations:
+- [X] Data load implementation (C + Java)
+- [ ] Double pass data load implementation (C + Java)
+- [X] Random insertion implementation (C + Java)
+
+Results Collected:
 - [ ] Single-pass data load timing on RPi 3
 - [ ] Double-pass data load timing on RPi 3
 - [ ] OpenJDK vs Oracle JDK comparison on the RPi
