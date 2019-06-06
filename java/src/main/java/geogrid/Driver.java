@@ -112,7 +112,6 @@ public class Driver {
                 long totalTimeNanoSeconds = endTime - startTime; // nanoseconds
                 long totalTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(totalTimeNanoSeconds); // milliseconds
                 runTimes[iterations] = totalTimeMilliSeconds;
-                runtime.gc(); // Runs the garbage collector
                 long memory = runtime.totalMemory() - runtime.freeMemory();
                 memoryUsage[iterations] = memory;
                 //System.out.println("Time elapsed (milliseconds): " + totalTimeMilliSeconds);
@@ -133,21 +132,21 @@ public class Driver {
                 System.out.println(memoryUsage[i]);
             }*/
 
-            long runTimeAverage = calculateAverage(runTimes);
-            long memoryUsageAverage = calculateAverage(memoryUsage);
-            long memoryUsageTotal = calculateTotal(memoryUsage);
-            long endTime = System.nanoTime();
-            long allIterationTime = endTime - startTime;
-            long allIterationTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(allIterationTime);
-
-            System.out.println("-> " + grids.size());
-            System.out.println("RESULTS");
-            System.out.println("-----------");
-            System.out.println("Average run time:  " + runTimeAverage + " milliseconds");
-            System.out.println("Average memory usage: " + memoryUsageAverage + " bytes");
-            System.out.println("Total iterations: " + iterationSize);
-            System.out.println("Total run time elapsed: " + allIterationTimeMilliSeconds + " milliseconds");
-            System.out.println("Total memory used: " + memoryUsageTotal + " bytes");
+//            long runTimeAverage = calculateAverage(runTimes);
+//            long memoryUsageAverage = calculateAverage(memoryUsage);
+//            long memoryUsageTotal = calculateTotal(memoryUsage);
+//            long endTime = System.nanoTime();
+//            long allIterationTime = endTime - startTime;
+//            long allIterationTimeMilliSeconds = TimeUnit.NANOSECONDS.toMillis(allIterationTime);
+//
+//            System.out.println("-> " + grids.size());
+//            System.out.println("RESULTS");
+//            System.out.println("-----------");
+//            System.out.println("Average run time:  " + runTimeAverage + " milliseconds");
+//            System.out.println("Average memory usage: " + memoryUsageAverage + " bytes");
+//            System.out.println("Total iterations: " + iterationSize);
+//            System.out.println("Total run time elapsed: " + allIterationTimeMilliSeconds + " milliseconds");
+//            System.out.println("Total memory used: " + memoryUsageTotal + " bytes");
         } catch (Exception e) {
             e.printStackTrace();
         }
