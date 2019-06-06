@@ -20,6 +20,13 @@ void geode_add_sprange(struct geode *g, const struct spatial_range *sr)
     roaring_bitmap_add(g->bmp, idx);
 }
 
+void geode_add_xy(struct geode *g, const int x, const int y)
+{
+    unsigned int idx = geode_xy_to_idx(g, x, y);
+    roaring_bitmap_add(g->bmp, idx);
+}
+
+
 struct geode *geode_create(char *base_geohash, unsigned int precision)
 {
     struct geode *g = malloc(sizeof(struct geode));
