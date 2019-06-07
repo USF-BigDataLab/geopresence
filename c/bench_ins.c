@@ -3,9 +3,23 @@
 
 #define TEST_PRECISION 16
 
-int main(void)
+int main(int argc, char *argv[])
 {
-    FILE *fp = fopen("../datasets/geohashes.txt", "r");
+    if (argc != 2) {
+        fprintf(stderr,
+                "Usage: %s geohash_file.txt\n"
+                "Ex: %s ../datasets/geohashes.txt\n",
+                argv[0], argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    printf("Opening %s\n", argv[1]);
+    FILE *fp = fopen(argv[1], "r");
+    if (fp == NULL) {
+        perror("fopen");
+        return EXIT_FAILURE;
+    }
+
     struct geode *instances = NULL;
 
     char line[128];
