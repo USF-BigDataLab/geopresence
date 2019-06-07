@@ -2,12 +2,12 @@ package geogrid;
 
 public class RandomDriver {
 
-    public void benchmark() {
+    public void benchmark(long iterations) {
         long startTime = System.nanoTime();
 
         GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 16);
 
-        for (int i = 0; i < 10000000; ++i) {
+        for (int i = 0; i < iterations; ++i) {
             float minLat = gg.getBaseRange().getLowerBoundForLatitude();
             float maxLat = gg.getBaseRange().getUpperBoundForLatitude();
             float randomLat = minLat + (float) Math.random() * (maxLat - minLat);
@@ -25,7 +25,7 @@ public class RandomDriver {
 
     public static void main(String[] args) throws Exception {
         RandomDriver d = new RandomDriver();
-        d.benchmark();
+        d.benchmark(Integer.parseInt(args[0]));
     }
 
 }
