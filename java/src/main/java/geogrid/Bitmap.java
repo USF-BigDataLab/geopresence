@@ -76,6 +76,10 @@ public class Bitmap implements Iterable<Integer> {
         return this.bmp.intersects(otherBitmap.bmp);
     }
 
+    public int cardinality() {
+        return this.bmp.cardinality();
+    }
+
     public int[] toArray() {
         return this.bmp.toArray();
     }
