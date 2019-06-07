@@ -19,8 +19,11 @@ public class RandomDriver {
             gg.addPoint(new Coordinates(randomLat, randomLon));
         }
 
+        Bitmap b = gg.getBitmap();
+
         long endTime = System.nanoTime();
         System.out.println((endTime - startTime) * 1E-6);
+        System.out.println(b.cardinality());
     }
 
     public static void main(String[] args) throws Exception {
