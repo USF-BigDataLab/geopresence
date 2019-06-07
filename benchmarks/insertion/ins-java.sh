@@ -19,7 +19,7 @@ for i in {1..100}; do
     /usr/bin/time -v java \
         -Xmx800M -Xms800M \
         -cp ./target/geogrid-1.0.jar \
-            geogrid.Driver \
+            geogrid.Driver ../datasets/geohashes.txt \
                 &> "${out_dir}/run.${i}.txt"
     echo "X"
 done

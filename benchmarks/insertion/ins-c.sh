@@ -7,11 +7,14 @@ mkdir -vp "${out_dir}"
 cd ../../c
 pwd
 
+echo -n "Compiling... "
 gcc -O3 bench_ins.c geode.c geohash.c timer.c -o bench_ins
+echo "Done"
 
 for i in {1..100}; do
     echo -n "${i} ... "
-    /usr/bin/time -v ./bench_ins &> "${out_dir}/run.${i}.txt"
+    /usr/bin/time -v ./bench_ins \
+        ../datasets/geohashes.txt &> "${out_dir}/run.${i}.txt"
     echo "X"
 done
 
