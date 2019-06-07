@@ -43,7 +43,7 @@ Since we're targeting IoT deployments, we will test on a Raspberry Pi.
 
 Implementations:
 - [X] Data load implementation (C + Java)
-- [ ] Double pass data load implementation (C + Java)
+- [X] Double pass data load implementation (C + Java)
 - [X] Random insertion implementation (C + Java)
 
 Results Collected:
