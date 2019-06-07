@@ -13,8 +13,11 @@ public class RandomDriver {
         float maxLon = gg.getBaseRange().getUpperBoundForLongitude();
 
         for (int i = 0; i < iterations; ++i) {
-            float randomLat = minLat + (float) Math.random() * (maxLat - minLat);
-            float randomLon = minLon + (float) Math.random() * (maxLon - minLon);
+            float randomLat
+                = minLat + (float) Math.random() * (maxLat - minLat);
+
+            float randomLon
+                = minLon + (float) Math.random() * (maxLon - minLon);
 
             gg.addPoint(new Coordinates(randomLat, randomLon));
         }
