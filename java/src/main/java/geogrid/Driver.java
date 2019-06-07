@@ -73,7 +73,7 @@ public class Driver {
         return total;
     }
 
-    public void benchmark() {
+    public void benchmark(String filename) {
         long startTime = System.nanoTime(); // Used for calculating time
         Map<String, GeoavailabilityGrid> grids = new HashMap<>(); // geogrid for testing
         long[] runTimes = new long[100]; // Stores the run time of each iteration
@@ -81,7 +81,6 @@ public class Driver {
 
         try {
             while (iterations < iterationSize) {
-                String filename = "geohashes.txt"; // Put file name here
                 BufferedReader br = new BufferedReader(new FileReader(filename));
                 String line = br.readLine();
                 dataCounter = 0;
@@ -155,7 +154,7 @@ public class Driver {
     public static void main(String[] args) throws Exception {
         Driver d = new Driver();
         //d.readFile(args[0]);
-        d.benchmark();
+        d.benchmark(args[0]);
         System.out.println("Benchmark Complete");
     }
 
