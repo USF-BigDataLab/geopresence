@@ -47,10 +47,10 @@ Implementations:
 - [X] Random insertion implementation (C + Java)
 
 Results Collected:
-- [ ] Single-pass data load timing on RPi 3
+- [X] Single-pass data load timing on RPi 3
 - [ ] Double-pass data load timing on RPi 3
 - [ ] OpenJDK vs Oracle JDK comparison on the RPi
-- [ ] Single-pass memory consumption
+- [X] Single-pass memory consumption
 - [ ] Double-pass memory consumption
 - [ ] Batched insertion benchmark
 - [ ] Random insertion benchmark
