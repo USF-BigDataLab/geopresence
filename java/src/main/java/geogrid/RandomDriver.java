@@ -5,7 +5,7 @@ public class RandomDriver {
     public void benchmark(long iterations) {
         long startTime = System.nanoTime();
 
-        GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 20);
+        GeoavailabilityGrid gg = new GeoavailabilityGrid("9x", 30);
 
         float minLat = gg.getBaseRange().getLowerBoundForLatitude();
         float maxLat = gg.getBaseRange().getUpperBoundForLatitude();

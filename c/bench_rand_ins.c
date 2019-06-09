@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#define TEST_PRECISION 28
+#define TEST_PRECISION 30
 
 int main(int argc, char *argv[])
 {
