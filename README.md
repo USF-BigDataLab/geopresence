@@ -48,12 +48,12 @@ Implementations:
 
 Results Collected:
 - [X] Single-pass data load timing on RPi 3
-- [ ] Double-pass data load timing on RPi 3
+- [X] Double-pass data load timing on RPi 3
 - [ ] OpenJDK vs Oracle JDK comparison on the RPi
 - [X] Single-pass memory consumption
-- [ ] Double-pass memory consumption
-- [ ] Batched insertion benchmark
-- [ ] Random insertion benchmark
+- [X] Double-pass memory consumption
+- [ ] ~~Batched insertion benchmark~~
+- [X] Random insertion benchmark
 
 ## Task 2: Probabilistic Point Density Estimation
 
