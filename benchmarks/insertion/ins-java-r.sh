@@ -28,5 +28,8 @@ done
 
 grep 'wall clock' "${out_dir}"/run.*.txt | awk '{print $9}' | sed 's|0:||g' \
     > "${out_dir}/wall_clock.txt"
+grep 'Maximum resident' "${out_dir}"/run.*.txt | awk '{print $7}' \
+    > "${out_dir}/max_mem.txt"
 
 txtstats "${out_dir}/wall_clock.txt"
+txtstats "${out_dir}/max_mem.txt"
