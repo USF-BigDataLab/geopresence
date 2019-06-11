@@ -1,0 +1,26 @@
+Jun 11, 2019 5:52:02 AM geogrid.GeoavailabilityGrid <init>
+INFO: Created geoavailability grid: geohash=9x, precision=30, width=32,768, height=32,768, baseRange=[(45.0, -112.5), (39.375, -101.25)], xDegreesPerPixel=0, yDegreesPerPixel=0
+105521.828415
+	Command being timed: "java -Xmx800M -Xms800M -cp ./target/geogrid-1.0.jar geogrid.RandomDriver 100000"
+	User time (seconds): 106.27
+	System time (seconds): 0.12
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:45.95
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 37976
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 6501
+	Voluntary context switches: 2322
+	Involuntary context switches: 3924
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 16
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
