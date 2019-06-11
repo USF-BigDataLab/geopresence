@@ -6,8 +6,9 @@ out_dir="$(pwd)/java_r_out"
 rm -rf "${out_dir}"
 mkdir -vp "${out_dir}"
 
-export JAVA_HOME="${HOME}/jdk1.8.0_212"
-export PATH="${JAVA_HOME}/bin:${PATH}"
+# Set to a specific JDK:
+# export JAVA_HOME="${HOME}/jdk1.8.0_212"
+# export PATH="${JAVA_HOME}/bin:${PATH}"
 
 java -version
 
