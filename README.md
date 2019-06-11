@@ -49,7 +49,7 @@ Implementations:
 Results Collected:
 - [X] Single-pass data load timing on RPi 3
 - [X] Double-pass data load timing on RPi 3
-- [ ] OpenJDK vs Oracle JDK comparison on the RPi
+- [X] OpenJDK 8 vs Oracle JDK 8, also OpenJDK 11
 - [X] Single-pass memory consumption
 - [X] Double-pass memory consumption
 - [ ] ~~Batched insertion benchmark~~
