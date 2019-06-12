@@ -1,8 +1,8 @@
 cont:
-	latexmk -pdf -bibtex -pvc
+	latexmk -pdf -bibtex -pvc geopresence
 
 once:
-	latexmk -pdf -bibtex
+	latexmk -pdf -bibtex geopresence
 
 clean:
-	latexmk -pdf -bibtex -c
+	latexmk -pdf -bibtex -c geopresence
