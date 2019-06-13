@@ -53,7 +53,7 @@ Results Collected:
 - [X] Single-pass memory consumption
 - [X] Double-pass memory consumption
 - [ ] ~~Batched insertion benchmark~~
-- [ ] Random insertion benchmark - OpenJDK 11 Pending
+- [X] Random insertion benchmark - OpenJDK 11 Pending
 
 ## Task 2: Probabilistic Point Density Estimation
 
