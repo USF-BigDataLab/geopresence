@@ -17,7 +17,7 @@ sns.set_style("whitegrid")
 mattplot = ["#b798d8", "#c3e7f4", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
 sns.set_palette(mattplot)
 
-cols = ['Memory Usage (MB)', 'Platform', 'Type']
+cols = ['Average Memory Usage (MB)', 'Platform', 'Type']
 
 single_j = pd.read_csv('java_out_20190610-1/max_mem.txt',
         header=None, names=cols) / 1000
