@@ -17,7 +17,7 @@ sns.set_style("whitegrid")
 mattplot = ["#b798d8", "#c3e7f4", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
 sns.set_palette(mattplot)
 
-cols = ['Average Memory Usage (MB)', 'Platform', 'Type']
+cols = ['Average Peak Memory (MB)', 'Platform', 'Type']
 
 single_j = pd.read_csv('java_out_20190610-1/max_mem.txt',
         header=None, names=cols) / 1000
@@ -51,7 +51,7 @@ random_c = pd.read_csv('c_r_out_20190608-1/max_mem.txt',
 random_c['Platform'] = 'GEODE'
 random_c['Type'] = 'Random Location'
 
-plt.suptitle('Memory Consumption', fontsize=16)
+plt.suptitle('Peak Memory Consumption', fontsize=16)
 
 data = pd.concat(
         (single_c, single_j, double_c, double_j, random_c, random_j)
