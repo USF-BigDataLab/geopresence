@@ -1,0 +1,16 @@
+\section{Related Work}
+
+
+Galileo \cite{malensek2013polygon,malensek2014evaluating,malensek2016autonomous} supports bitmap-based geospatial queries through its \emph{Geoavailability Grid} data structure. The system allows querying over arbitrary polygons and performs geospatial partitioning for distributed evaluation.  However, the approach does not consider the density of spatial point data; in other words, the Geoavailability Grid hosting data for New York (high density) will have the same resolution as the grid that manages data for Wyoming (low density). Additionally, the approach is stateless and does not support efficient continuous refinement of queries (either through changes to the viewport or polygon of interest), or have a well-defined storage format for fast serialization of matching data points.
+
+. rtrees are bad because they will explode the number of subtrees and lookups will start to take a long time. Look at the book for more weaknesses
+. quadtrees don't fan out much so can get even huger than r-trees for big data. 
+. From the old CiSE paper: P2PR-Tree \cite{} is a P2P-based version of the R-Tree spatial index. The system is decentralized and can also service
+spatial queries while peers are leaving or joining the network. In P2PR-Tree, queries are routed to nodes that may
+have pertinent information, with a traversal through the network closely resembling a traversal through an RTree. This traversal pattern allows the system to cope with frequently added or removed nodes, but also involves
+additional routing steps that could increase latencies. Initially, the range of possible spatial values is broken up
+into blocks, with each block being statically divided into a pre-set number of groups. Nodes in the system are then
+divided into multiple levels of subgroups with neighboring peers maintaining more detailed information about one
+another. Each peer also maintains a local R-Tree for performing lookups on the data it holds. P2PR-Tree is well-suited for collections of information with geospatial properties, but does not support multidimensional datasets
+directly
+. maybe beat up on mongo a little bit?
