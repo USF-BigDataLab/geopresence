@@ -48,6 +48,7 @@ typedef struct GeoCoordStruct {
     double east;
     double south;
     double west;
+    GeoBoxDimension dimension;
 
     
 } GeoCoord;
