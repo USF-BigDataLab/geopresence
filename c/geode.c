@@ -7,26 +7,12 @@
 #include "uthash.h"
 #include "geohash.h"
 
-void geode_add_geohash(struct geode *g, const char *geohash)
-{
-    struct spatial_range sr;
-    geohash_decodeN(&sr, geohash);
-    geode_add_sprange(g, &sr);
-}
-
-void geode_add_sprange(struct geode *g, const struct spatial_range *sr)
-{
-    unsigned int idx = geode_sprange_to_idx(g, sr);
-    roaring_bitmap_add(g->bmp, idx);
-}
-
-void geode_add_xy(struct geode *g, const int x, const int y)
-{
-    unsigned int idx = geode_xy_to_idx(g, x, y);
-    roaring_bitmap_add(g->bmp, idx);
-}
-
-
+/**
+ * Create a geode with a base hash and precision of bitmap
+ *
+ * @param base_geohash - starting hash
+ * @param print_geode  - precision of bitmap for the geode
+ */
 struct geode *geode_create(char *base_geohash, unsigned int precision)
 {
     struct geode *g = malloc(sizeof(struct geode));
@@ -37,7 +23,6 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
 
     memcpy(g->prefix, base_geohash, PREFIX_SZ);
     g->prefix[PREFIX_SZ] = '\0';
-    g->bmp = roaring_bitmap_create();
 
     geohash_decodeN(&g->base_range, g->prefix);
 
@@ -54,6 +39,8 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
 
     g->width = (1 << w); /* = 2^w */
     g->height = (1 << h); /* = 2^h */
+
+    g->bmp = roaring_bitmap_create_with_capacity(g->width * g->height);
 
     /* Determine the number of degrees in the x and y directions for the base
      * spatial range this GEODE represents */
@@ -74,6 +61,26 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
     return g;
 }
 
+void geode_add_geohash(struct geode *g, const char *geohash)
+{
+    struct spatial_range sr;
+    geohash_decodeN(&sr, geohash);
+    geode_add_sprange(g, &sr);
+}
+
+void geode_add_sprange(struct geode *g, const struct spatial_range *sr)
+{
+    unsigned int idx = geode_sprange_to_idx(g, sr);
+    roaring_bitmap_add(g->bmp, idx);
+}
+
+void geode_add_xy(struct geode *g, const int x, const int y)
+{
+    unsigned int idx = geode_xy_to_idx(g, x, y);
+    roaring_bitmap_add(g->bmp, idx);
+}
+
+
 /**
  * Converts X, Y coordinates to a particular index within the underlying
  * bitmap implementation.  Essentially this converts a 2D index to a 1D
@@ -90,9 +97,41 @@ int geode_xy_to_idx(struct geode *g, const int x, const int y)
     return y * g->width + x;
 }
 
+/**
+ * Prints a geocoord
+ */
 void print_geocoord(GeoCoord *gc)
 {
     printf("(%f, %f) in [%f, %f, %f, %f]\n", gc->longitude, gc->latitude, gc->north, gc->east, gc->south, gc->west);
+}
+
+/** 
+ * Prints geode as above
+ */
+void print_geode(struct geode *gc)
+{
+    printf("%s (%f, %f) in [%f, %f, %f, %f]\n", gc->prefix, gc->base_range.longitude, gc->base_range.latitude, gc->base_range.north, gc->base_range.east, gc->base_range.south, gc->base_range.west);
+}
+
+void print_pbm(roaring_bitmap_t *bmp, unsigned int x, unsigned int y, char *file_name) {
+
+  FILE *fp = fopen(file_name, "w");
+  
+  char header[128];
+
+  fputs("P1\n", fp);
+  int null_pos = sprintf(header, "%u %u\n", x, y);
+  header[null_pos] = '\0';
+  fputs(header, fp);
+
+  for (int i = 0; i < x; i++){
+    for (int j = 0; j < y; j++){
+      roaring_bitmap_contains(bmp, i*x + j) ? fputs("1", fp) : fputs("0", fp);
+      fputs(" ", fp);
+    }
+      fputs("\n", fp);
+  }
+  fclose(fp);
 }
 
 /**
@@ -120,8 +159,51 @@ unsigned int geode_sprange_to_idx(
     return geode_xy_to_idx(g, x, y);
 }
 
-//    struct geode *inst;
-//    for (inst = instances; inst != NULL; inst = inst->hh.next) {
-//        uint32_t c = roaring_bitmap_get_cardinality(inst->bmp);
-//        printf("-> %s %d\n", inst->prefix, c);
-//    }
+/**
+ * Query a geode's bitmap
+ *
+ * @param g     - geode to query
+ * @param query - the query as a GeoCoord
+ *
+ * @return true if any portion of g's bitmap is set and contained in the query
+ */
+bool geode_query(struct geode *g, GeoCoord *query, int geode_num) {
+  if (g == NULL) {
+    return false;
+  }
+  
+  struct spatial_range *base = &g->base_range;
+
+  /* Pick correct bounds for this geode's bitmap given the query */
+  double west = base->west < query->west ? query->west : base->west;
+  double north = base->north > query->north ? query->north : base->north;
+  double east = base->east < query->east ? base->east : query->east;
+  double south = base->south < query->south ? query->south : base->south;
+  
+  /* Find number of bits in each direction to check and starting point */
+  struct spatial_range new  = { 0 };
+  new.longitude = west;
+  new.latitude = north;
+  unsigned int x_bits = fabs(west - east) / g->x_px;
+  unsigned int y_bits = fabs(north - south) / g->y_px;
+  unsigned int start = geode_sprange_to_idx(g, &new);
+  
+  roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(g->width * g->height);
+
+  /* Find if any portion of the query is set in this geode's bitmap */
+  for (int i = 0; i < y_bits; i++) {
+    roaring_bitmap_add_range(r, start, start + x_bits);
+    start += g->width;
+  }
+
+  char f_whole[128];
+  char f_query[128];
+
+  *(f_whole + sprintf(f_whole, "whole_%d.pbm", geode_num)) = '\0';
+  *(f_query + sprintf(f_query, "query_%d.pbm", geode_num)) = '\0';
+
+  print_pbm(r, g->width, g->height, f_query);
+  print_pbm(g->bmp, g->width, g->height, f_whole);
+
+  return roaring_bitmap_intersect(g->bmp, r);
+}

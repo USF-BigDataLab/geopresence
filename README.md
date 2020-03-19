@@ -42,18 +42,37 @@ Since we're targeting IoT deployments, we will test on a Raspberry Pi.
 ### Benchmark Status
 
 Implementations:
+
 - [X] Data load implementation (C + Java)
+
 - [X] Double pass data load implementation (C + Java)
+
 - [X] Random insertion implementation (C + Java)
 
+- [ ] Data load and query (C + JAVA)
+
+
 Results Collected:
+
 - [X] Single-pass data load timing on RPi 3
+ 
 - [X] Double-pass data load timing on RPi 3
+ 
 - [X] OpenJDK 8 vs Oracle JDK 8, also OpenJDK 11
+ 
 - [X] Single-pass memory consumption
+ 
 - [X] Double-pass memory consumption
+
 - [ ] ~~Batched insertion benchmark~~
+
 - [X] Random insertion benchmark - OpenJDK 11 Pending
+
+### Queries in C
+
+In the current C implementation, a rectangular spatial range can act as the argument for a query. The spatial grid is searched for cells contained in the query and then the grid cell is searched for matching bits. Currently there is a query that returns wether data is in *any* of the grid cells, and one that returns a list of every matching grid cell. This algorithm was verified by rendering the grid cells and corresponding query cells in photoshop. 
+
+This has not been benchmarked yet and needs to be. 
 
 ## Task 2: Probabilistic Point Density Estimation
 

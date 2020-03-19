@@ -1,5 +1,11 @@
 #ifndef _GEOHASH_H_
 #define _GEOHASH_H_
+
+#define NORTH               0
+#define EAST                1
+#define SOUTH               2
+#define WEST                3
+
 /*
  *  geohash.h
  *  libgeohash
@@ -76,6 +82,12 @@ extern char* geohash_encode(double lat, double lng, int precision);
  * the bounding box for the encoded coordinate.
  */
 extern GeoCoord geohash_decode(char* hash);
+
+/*
+ * Return a single neighbor given a starting hash and direction
+ */
+
+extern char* get_neighbor(char *hash, int direction);
 
 /* 
  * Return an array of geohashes that represent the neighbors of the passed

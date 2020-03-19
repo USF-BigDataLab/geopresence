@@ -47,11 +47,6 @@
 #define MAX_LONG            180.0
 #define MIN_LONG            -180.0
 
-#define NORTH               0
-#define EAST                1
-#define SOUTH               2
-#define WEST                3
-
 #define LENGTH_OF_DEGREE	111100				// meters
 
 typedef struct IntervalStruct {
@@ -312,8 +307,6 @@ int geohash_decodeN(struct spatial_range *bbox, const char *hash) {
 
     return 0;
 }
-
-
 
 char** geohash_neighbors(char *hash) {
 
