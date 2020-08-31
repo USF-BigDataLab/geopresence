@@ -1,12 +1,22 @@
-CFLAGS += -Wall -std=c11
+PROGS = bench_ins bench_rand_ins
 
-all: bench_rand_ins bench_ins
+OBJS = geode.o geohash.o timer.o grid_queries.o bitmap_graphics.o
 
-bench_rand_ins: bench_rand_ins.c geode.c timer.c geohash.c
-	gcc -Wall bench_rand_ins.c geode.c timer.c geohash.c -o bench_rand_ins
+CFLAGS = -g -Wall -std=c11
 
-bench_ins: bench_ins.c geode.c timer.c geohash.c
-	gcc -Wall bench_ins.c geode.c timer.c geohash.c grid_queries.c -o bench_ins 
+%.o : %.s
+	as -o $@ $<
 
-clean:
-	rm -f bench_rand_ins bench_ins
+%.o : %.c
+	gcc -c ${CFLAGS} -o $@ $<
+
+all : ${PROGS}
+
+bench_ins : bench_ins.c ${OBJS}
+	gcc ${CFLAGS} -o $@ $^ 
+
+bench_rand_ins : bench_rand_ins.c ${OBJS}
+	gcc ${CFLAGS} -o $@ $^
+
+clean :
+	rm -rf ${PROGS} ${OBJS} 

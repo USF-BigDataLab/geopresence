@@ -20,6 +20,12 @@ struct geode {
     UT_hash_handle hh;
 };
 
+typedef struct {
+	int x, y;
+}
+geodePoint, *geodePointPtr;
+
+
 void geode_add_geohash(struct geode *g, const char *geohash);
 void geode_add_sprange(struct geode *g, const struct spatial_range *sr);
 void geode_add_xy(struct geode *g, const int x, const int y);
@@ -45,5 +51,6 @@ struct geode *geode_create(char *base_geohash, unsigned int precision);
 void geode_free(struct geode *g);
 int geode_xy_to_idx(struct geode *g, int x, int y);
 bool geode_query(struct geode *g, GeoCoord *query, int geode_num);
+bool geode_polygon_query(struct geode *g, geodePointPtr points, int n);
 
 #endif

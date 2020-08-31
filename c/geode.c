@@ -6,6 +6,7 @@
 #include "roaring.c"
 #include "uthash.h"
 #include "geohash.h"
+#include "bitmap_graphics.h"
 
 /**
  * Create a geode with a base hash and precision of bitmap
@@ -206,4 +207,16 @@ bool geode_query(struct geode *g, GeoCoord *query, int geode_num) {
   print_pbm(g->bmp, g->width, g->height, f_whole);
 
   return roaring_bitmap_intersect(g->bmp, r);
+}
+
+bool geode_polygon_query(struct geode *g, geodePointPtr points, int n) {
+	roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(1000 * 1000);
+    char* f_query = "polygon_query.pbm";
+	bmp_filled_polygon(r, points, n, 1000);
+    for (int i = 0; i < n; i++) {
+        printf("x: %d y: %d\n", points[i].x, points[i].y);
+    }
+    print_pbm(r, 1000, 1000, f_query);
+	free(points);
+    return roaring_bitmap_intersect(g->bmp, r);
 }

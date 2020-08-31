@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
     coord.south = 30;
     coord.west = -89;
     char** res = matching_grid_cells(instances, &coord);
+    matching_grid_cells_polygon(instances);
 
     char** save = res;
 

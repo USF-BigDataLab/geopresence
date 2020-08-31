@@ -55,7 +55,6 @@ typedef struct GeoCoordStruct {
     double south;
     double west;
     GeoBoxDimension dimension;
-
     
 } GeoCoord;
 
