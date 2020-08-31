@@ -1,7 +1,7 @@
-
-
-
-
+#include "roaring.h"
+#include "geode.h"
+#include "bitmap_graphics.h"
+#include <math.h>
 
 /**
  * Function: gdImageFilledPolygon
@@ -13,15 +13,14 @@
  * a future version.
  *
  * Parameters:
- *   im - The image.
- *   p  - The vertices as array of <gdPoint>s.
+ *   im - The roaring bitmap.
+ *   p  - The vertices as array of <geodePoint>s.
  *   n  - The number of vertices.
- *   c  - The color
  *
  * See also:
  *   - <gdImagePolygon>
  */
-BGD_DECLARE(void) gdImageFilledPolygon (gdImagePtr im, gdPointPtr p, int n, int c)
+void bmp_filled_polygon (roaring_bitmap_t *bmp, geodePointPtr p, int n, int width, int height)
 {
 	int i;
 	int j;
@@ -32,39 +31,16 @@ BGD_DECLARE(void) gdImageFilledPolygon (gdImagePtr im, gdPointPtr p, int n, int 
 	int x2, y2;
 	int ind1, ind2;
 	int ints;
-	int fill_color;
-	if (n <= 0) {
+    int *poly_ints;
+	if (n <= 0 || n > 100) {
 		return;
 	}
 
-	if (c == gdAntiAliased) {
-		fill_color = im->AA_color;
-	} else {
-		fill_color = c;
-	}
-	if (!im->polyAllocated) {
-		if (overflow2(sizeof (int), n)) {
-			return;
-		}
-		im->polyInts = (int *) gdMalloc (sizeof (int) * n);
-		if (!im->polyInts) {
-			return;
-		}
-		im->polyAllocated = n;
-	}
-	if (im->polyAllocated < n) {
-		while (im->polyAllocated < n) {
-			im->polyAllocated *= 2;
-		}
-		if (overflow2(sizeof (int), im->polyAllocated)) {
-			return;
-		}
-		im->polyInts = (int *) gdReallocEx (im->polyInts,
-						    sizeof (int) * im->polyAllocated);
-		if (!im->polyInts) {
-			return;
-		}
-	}
+    poly_ints = (int *) malloc(sizeof (int) * n);
+    if (!poly_ints) {
+        return;
+    }
+
 	miny = p[0].y;
 	maxy = p[0].y;
 	for (i = 1; (i < n); i++) {
@@ -85,18 +61,11 @@ BGD_DECLARE(void) gdImageFilledPolygon (gdImagePtr im, gdPointPtr p, int n, int 
 				x2 = p[i].x;
 			}
 		}
-		gdImageLine(im, x1, miny, x2, miny, c);
+		bmp_draw_line(bmp, x1, miny, x2, miny, width, height);
 		return;
 	}
 	pmaxy = maxy;
-	/* 2.0.16: Optimization by Ilia Chipitsine -- don't waste time offscreen */
-	/* 2.0.26: clipping rectangle is even better */
-	if (miny < im->cy1) {
-		miny = im->cy1;
-	}
-	if (maxy > im->cy2) {
-		maxy = im->cy2;
-	}
+
 	/* Fix in 1.3: count a vertex only once */
 	for (y = miny; (y <= maxy); y++) {
 		ints = 0;
@@ -126,11 +95,12 @@ BGD_DECLARE(void) gdImageFilledPolygon (gdImagePtr im, gdPointPtr p, int n, int 
 			 * that Polygon and FilledPolygon for the same set of points have the
 			 * same footprint. */
 
+
 			if ((y >= y1) && (y < y2)) {
-				im->polyInts[ints++] = (int) ((float) ((y - y1) * (x2 - x1)) /
+				poly_ints[ints++] = (int) ((float) ((y - y1) * (x2 - x1)) /
 				                              (float) (y2 - y1) + 0.5 + x1);
 			} else if ((y == pmaxy) && (y == y2)) {
-				im->polyInts[ints++] = x2;
+				poly_ints[ints++] = x2;
 			}
 		}
 		/*
@@ -140,70 +110,67 @@ BGD_DECLARE(void) gdImageFilledPolygon (gdImagePtr im, gdPointPtr p, int n, int 
 		  future implementations that may wish to indirect through a table.
 		*/
 		for (i = 1; (i < ints); i++) {
-			index = im->polyInts[i];
+			index = poly_ints[i];
 			j = i;
-			while ((j > 0) && (im->polyInts[j - 1] > index)) {
-				im->polyInts[j] = im->polyInts[j - 1];
+			while ((j > 0) && (poly_ints[j - 1] > index)) {
+				poly_ints[j] = poly_ints[j - 1];
 				j--;
 			}
-			im->polyInts[j] = index;
+			poly_ints[j] = index;
 		}
 		for (i = 0; (i < (ints-1)); i += 2) {
 			/* 2.0.29: back to gdImageLine to prevent segfaults when
 			  performing a pattern fill */
-			gdImageLine (im, im->polyInts[i], y, im->polyInts[i + 1], y,
-			             fill_color);
+			bmp_draw_line (bmp, poly_ints[i], y, poly_ints[i + 1], y, width, height);
 		}
-	}
-	/* If we are drawing this AA, then redraw the border with AA lines. */
-	/* This doesn't work as well as I'd like, but it doesn't clash either. */
-	if (c == gdAntiAliased) {
-		gdImagePolygon (im, p, n, c);
 	}
 }
 
 
 /*
-	Function: gdImageLine
-
+	Function: bmp_draw_line
 	Bresenham as presented in Foley & Van Dam.
 */
-BGD_DECLARE(void) gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, int color)
+void bmp_draw_line (roaring_bitmap_t *bmp, int x1, int y1, int x2, int y2, int width, int height)
 {
 	int dx, dy, incr1, incr2, d, x, y, xend, yend, xdirflag, ydirflag;
 	int wid;
 	int w, wstart;
-	int thick;
+	int thick = 1;
 
-	if (color == gdAntiAliased) {
-		/*
-		  gdAntiAliased passed as color: use the much faster, much cheaper
-		  and equally attractive gdImageAALine implementation. That
-		  clips too, so don't clip twice.
-		*/
-		gdImageAALine(im, x1, y1, x2, y2, im->AA_color);
-		return;
-	}
 	/* 2.0.10: Nick Atty: clip to edges of drawing rectangle, return if no
 	   points need to be drawn. 2.0.26, TBB: clip to edges of clipping
 	   rectangle. We were getting away with this because gdImageSetPixel
 	   is used for actual drawing, but this is still more efficient and opens
 	   the way to skip per-pixel bounds checking in the future. */
 
-	if (clip_1d (&x1, &y1, &x2, &y2, im->cx1, im->cx2) == 0)
+	if (clip_1d (&x1, &y1, &x2, &y2, 0, width) == 0)
 		return;
-	if (clip_1d (&y1, &x1, &y2, &x2, im->cy1, im->cy2) == 0)
+	if (clip_1d (&y1, &x1, &y2, &x2, 0, height) == 0)
 		return;
-	thick = im->thick;
 
 	dx = abs (x2 - x1);
 	dy = abs (y2 - y1);
 
 	if (dx == 0) {
-		gdImageVLine(im, x1, y1, y2, color);
+		if (y2 < y1) {
+			int t = y1;
+			y1 = y2;
+			y2 = t;
+		}
+
+		for (; y1 <= y2; y1++) {
+			roaring_bitmap_add(bmp, y1 * width + x1);
+		}
 		return;
 	} else if (dy == 0) {
-		gdImageHLine(im, y1, x1, x2, color);
+        if (x2 < x1) {
+			int t = x2;
+			x2 = x1;
+			x1 = t;
+		}
+        double start = width * y1;
+        roaring_bitmap_add_range(bmp, start + x1, start + x2);
 		return;
 	}
 
@@ -240,7 +207,7 @@ BGD_DECLARE(void) gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, in
 		/* Set up line thickness */
 		wstart = y - wid / 2;
 		for (w = wstart; w < wstart + wid; w++)
-			gdImageSetPixel (im, x, w, color);
+			roaring_bitmap_add(bmp, x + w * width);
 
 		if (((y2 - y1) * ydirflag) > 0) {
 			while (x < xend) {
@@ -253,7 +220,7 @@ BGD_DECLARE(void) gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, in
 				}
 				wstart = y - wid / 2;
 				for (w = wstart; w < wstart + wid; w++)
-					gdImageSetPixel (im, x, w, color);
+			        roaring_bitmap_add(bmp, x + w * width);
 			}
 		} else {
 			while (x < xend) {
@@ -266,7 +233,7 @@ BGD_DECLARE(void) gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, in
 				}
 				wstart = y - wid / 2;
 				for (w = wstart; w < wstart + wid; w++)
-					gdImageSetPixel (im, x, w, color);
+			        roaring_bitmap_add(bmp, x + w * width);
 			}
 		}
 	} else {
@@ -297,10 +264,8 @@ BGD_DECLARE(void) gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, in
 			xdirflag = 1;
 		}
 
-		/* Set up line thickness */
-		wstart = x - wid / 2;
-		for (w = wstart; w < wstart + wid; w++)
-			gdImageSetPixel (im, w, y, color);
+		wstart = (x - wid / 2) + (y * width);
+		roaring_bitmap_add_range(bmp, wstart, wstart + wid);
 
 		if (((x2 - x1) * xdirflag) > 0) {
 			while (y < yend) {
@@ -311,9 +276,8 @@ BGD_DECLARE(void) gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, in
 					x++;
 					d += incr2;
 				}
-				wstart = x - wid / 2;
-				for (w = wstart; w < wstart + wid; w++)
-					gdImageSetPixel (im, w, y, color);
+                wstart = (x - wid / 2) + (y * width);
+                roaring_bitmap_add_range(bmp, wstart, wstart + wid);
 			}
 		} else {
 			while (y < yend) {
@@ -324,50 +288,87 @@ BGD_DECLARE(void) gdImageLine (gdImagePtr im, int x1, int y1, int x2, int y2, in
 					x--;
 					d += incr2;
 				}
-				wstart = x - wid / 2;
-				for (w = wstart; w < wstart + wid; w++)
-					gdImageSetPixel (im, w, y, color);
+                wstart = (x - wid / 2) + (y * width);
+                roaring_bitmap_add_range(bmp, wstart, wstart + wid);
 			}
 		}
 	}
-
 }
 
-static void gdImageHLine(gdImagePtr im, int y, int x1, int x2, int col)
+
+/* 2.0.10: before the drawing routines, some code to clip points that are
+ * outside the drawing window.  Nick Atty (nick@canalplan.org.uk)
+ *
+ * This is the Sutherland Hodgman Algorithm, as implemented by
+ * Duvanenko, Robbins and Gyurcsik - SH(DRG) for short.  See Dr Dobb's
+ * Journal, January 1996, pp107-110 and 116-117
+ *
+ * Given the end points of a line, and a bounding rectangle (which we
+ * know to be from (0,0) to (SX,SY)), adjust the endpoints to be on
+ * the edges of the rectangle if the line should be drawn at all,
+ * otherwise return a failure code */
+
+/* this does "one-dimensional" clipping: note that the second time it
+   is called, all the x parameters refer to height and the y to width
+   - the comments ignore this (if you can understand it when it's
+   looking at the X parameters, it should become clear what happens on
+   the second call!)  The code is simplified from that in the article,
+   as we know that gd images always start at (0,0) */
+
+/* 2.0.26, TBB: we now have to respect a clipping rectangle, it won't
+	necessarily start at 0. */
+
+int clip_1d (int *x0, int *y0, int *x1, int *y1, int mindim, int maxdim)
 {
-	if (im->thick > 1) {
-		int thickhalf = im->thick >> 1;
-		_gdImageFilledHRectangle(im, x1, y - thickhalf, x2, y + im->thick - thickhalf - 1, col);
-	} else {
-		if (x2 < x1) {
-			int t = x2;
-			x2 = x1;
-			x1 = t;
+	double m;			/* gradient of line */
+	if (*x0 < mindim) {
+		/* start of line is left of window */
+		if (*x1 < mindim)		/* as is the end, so the line never cuts the window */
+			return 0;
+		m = (*y1 - *y0) / (double) (*x1 - *x0);	/* calculate the slope of the line */
+		/* adjust x0 to be on the left boundary (ie to be zero), and y0 to match */
+		*y0 -= (int)(m * (*x0 - mindim));
+		*x0 = mindim;
+		/* now, perhaps, adjust the far end of the line as well */
+		if (*x1 > maxdim) {
+			*y1 += m * (maxdim - *x1);
+			*x1 = maxdim;
 		}
-
-		for (; x1 <= x2; x1++) {
-			gdImageSetPixel(im, x1, y, col);
-		}
+		return 1;
 	}
-	return;
+	if (*x0 > maxdim) {
+		/* start of line is right of window -
+		complement of above */
+		if (*x1 > maxdim)		/* as is the end, so the line misses the window */
+			return 0;
+		m = (*y1 - *y0) / (double) (*x1 - *x0);	/* calculate the slope of the line */
+		*y0 += (int)(m * (maxdim - *x0));	/* adjust so point is on the right
+							   boundary */
+		*x0 = maxdim;
+		/* now, perhaps, adjust the end of the line */
+		if (*x1 < mindim) {
+			*y1 -= (int)(m * (*x1 - mindim));
+			*x1 = mindim;
+		}
+		return 1;
+	}
+	/* the final case - the start of the line is inside the window */
+	if (*x1 > maxdim) {
+		/* other end is outside to the right */
+		m = (*y1 - *y0) / (double) (*x1 - *x0);	/* calculate the slope of the line */
+		*y1 += (int)(m * (maxdim - *x1));
+		*x1 = maxdim;
+		return 1;
+	}
+	if (*x1 < mindim) {
+		/* other end is outside to the left */
+		m = (*y1 - *y0) / (double) (*x1 - *x0);	/* calculate the slope of the line */
+		*y1 -= (int)(m * (*x1 - mindim));
+		*x1 = mindim;
+		return 1;
+	}
+	/* only get here if both points are inside the window */
+	return 1;
 }
 
-static void gdImageVLine(gdImagePtr im, int x, int y1, int y2, int col)
-{
-	if (im->thick > 1) {
-		int thickhalf = im->thick >> 1;
-		gdImageFilledRectangle(im, x - thickhalf, y1, x + im->thick - thickhalf - 1, y2, col);
-	} else {
-		if (y2 < y1) {
-			int t = y1;
-			y1 = y2;
-			y2 = t;
-		}
-
-		for (; y1 <= y2; y1++) {
-			gdImageSetPixel(im, x, y1, col);
-		}
-	}
-	return;
-}
-
+/* end of line clipping code */

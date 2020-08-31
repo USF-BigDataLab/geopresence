@@ -210,13 +210,13 @@ bool geode_query(struct geode *g, GeoCoord *query, int geode_num) {
 }
 
 bool geode_polygon_query(struct geode *g, geodePointPtr points, int n) {
-	roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(1000 * 1000);
+	roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(100 * 100);
     char* f_query = "polygon_query.pbm";
-	bmp_filled_polygon(r, points, n, 1000);
+	bmp_filled_polygon(r, points, n, 100, 100);
     for (int i = 0; i < n; i++) {
         printf("x: %d y: %d\n", points[i].x, points[i].y);
     }
-    print_pbm(r, 1000, 1000, f_query);
+    print_pbm(r, 100, 100, f_query);
 	free(points);
     return roaring_bitmap_intersect(g->bmp, r);
 }

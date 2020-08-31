@@ -161,14 +161,13 @@ bool has_matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
 
 void matching_grid_cells_polygon(struct geode *grid)
 {
-    /* Iterate over grid and just query each node for now??? */
-    geodePointPtr points = (geodePointPtr)calloc(4, sizeof(gdPoint));
-	points[0].x = 0;
-	points[0].y = 0;
-	points[1].x = 500;
-	points[1].y = 500;
-	points[2].x = 800;
-	points[2].y = 100;
+    geodePointPtr points = (geodePointPtr)calloc(3, sizeof(gdPoint));
+    points[0].x = 10;
+	points[0].y = 10;
+	points[1].x = 50;
+	points[1].y = 70;
+	points[2].x = 90;
+	points[2].y = 30;
 
     geode_polygon_query(grid, points, 3);
 }
