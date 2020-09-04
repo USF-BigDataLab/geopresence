@@ -3,14 +3,18 @@
 #include "bitmap_graphics.h"
 #include <math.h>
 
+static void bmp_draw_line (roaring_bitmap_t *bmp, int x1, int y1, int x2, int y2, int width, int height);
+static int clip_1d (int *x0, int *y0, int *x1, int *y1, int mindim, int maxdim);
+
 /**
- * Function: gdImageFilledPolygon
+ * Function: bmp_filled_polygon
  *
- * Draws a filled polygon
+ * This is a modified implementation of gdImageFilledPolygon from the gd library.
+ *
+ * Draw a filled polygon into a roaring_bitmap_t.
  *
  * The polygon is filled using the even-odd fillrule what can leave unfilled
- * regions inside of self-intersecting polygons. This behavior might change in
- * a future version.
+ * regions inside of self-intersecting polygons.
  *
  * Parameters:
  *   im - The roaring bitmap.
@@ -19,9 +23,10 @@
  *
  * See also:
  *   - <gdImagePolygon>
+ *   - <gdImageFilledPolygon>
+ *   - <gdImageLine>
  */
-void bmp_filled_polygon (roaring_bitmap_t *bmp, geodePointPtr p, int n, int width, int height)
-{
+void bmp_filled_polygon(roaring_bitmap_t *bmp, geodePointPtr p, int n, int width, int height) {
 	int i;
 	int j;
 	int index;
@@ -127,12 +132,12 @@ void bmp_filled_polygon (roaring_bitmap_t *bmp, geodePointPtr p, int n, int widt
 }
 
 
-/*
-	Function: bmp_draw_line
-	Bresenham as presented in Foley & Van Dam.
-*/
-void bmp_draw_line (roaring_bitmap_t *bmp, int x1, int y1, int x2, int y2, int width, int height)
-{
+/**
+ * Function: bmp_draw_line
+ * gdImageLine implementation modified to draw on a roaring_bitmap_t
+ * Bresenham as presented in Foley & Van Dam.
+ */
+static void bmp_draw_line(roaring_bitmap_t *bmp, int x1, int y1, int x2, int y2, int width, int height) {
 	int dx, dy, incr1, incr2, d, x, y, xend, yend, xdirflag, ydirflag;
 	int wid;
 	int w, wstart;
@@ -318,8 +323,7 @@ void bmp_draw_line (roaring_bitmap_t *bmp, int x1, int y1, int x2, int y2, int w
 /* 2.0.26, TBB: we now have to respect a clipping rectangle, it won't
 	necessarily start at 0. */
 
-int clip_1d (int *x0, int *y0, int *x1, int *y1, int mindim, int maxdim)
-{
+static int clip_1d(int *x0, int *y0, int *x1, int *y1, int mindim, int maxdim) {
 	double m;			/* gradient of line */
 	if (*x0 < mindim) {
 		/* start of line is left of window */
@@ -370,5 +374,3 @@ int clip_1d (int *x0, int *y0, int *x1, int *y1, int mindim, int maxdim)
 	/* only get here if both points are inside the window */
 	return 1;
 }
-
-/* end of line clipping code */

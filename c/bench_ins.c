@@ -3,10 +3,23 @@
 #include "geohash.h"
 #include "grid_queries.h"
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define TEST_PRECISION 16
 
 struct geode *instances = NULL;
+
+void print_strings_and_free(char **strings) {
+    char** save = strings;
+    printf("\n");
+    for (int i = 0; *(strings) != NULL; i++) {
+      printf("%s, ", *strings);
+      free(*strings);
+      strings++;
+    }
+    free(save);
+}
 
 int main(int argc, char *argv[])
 {
@@ -49,21 +62,30 @@ int main(int argc, char *argv[])
     coord.east = -66;
     coord.south = 30;
     coord.west = -89;
-    char** res = matching_grid_cells(instances, &coord);
-    matching_grid_cells_polygon(instances);
 
-    char** save = res;
+    struct spatial_range *points = (struct spatial_range*) calloc(3, sizeof(struct spatial_range));
+	points[0].longitude = -70;
+	points[0].latitude = 30;
 
-    for (int i = 0; *(res) != NULL; i++) {
-      printf("%s, ", *res);
-      free(*res);
-      res++;
-    }
-    free(save);
+	points[1].longitude = -85;
+	points[1].latitude = 36;
 
+	points[2].longitude = -88;
+	points[2].latitude = 34;
+
+
+    // Rectangle query
+   // char** res = matching_grid_cells(instances, &coord);
+   // print_strings_and_free(res);
+
+    // Polygon query
+    char** poly_res = matching_grid_cells_polygon(instances, points, 3);
+    print_strings_and_free(poly_res);
 
     double end = timer_now();
     printf("%f\n", end - start);
 
     fclose(fp);
+    return 0;
 }
+

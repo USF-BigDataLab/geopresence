@@ -34,6 +34,7 @@ unsigned int geode_sprange_to_idx(struct geode *g, const struct spatial_range *s
 
 void print_geocoord(GeoCoord *gc);
 void print_geode(struct geode *gc);
+void print_pbm(roaring_bitmap_t *bmp, unsigned int x, unsigned int y, char *file_name);
 
 /**
  * Initializes a new GEODE data structure using the provided base Geohash.
@@ -50,7 +51,7 @@ void print_geode(struct geode *gc);
 struct geode *geode_create(char *base_geohash, unsigned int precision);
 void geode_free(struct geode *g);
 int geode_xy_to_idx(struct geode *g, int x, int y);
-bool geode_query(struct geode *g, GeoCoord *query, int geode_num);
-bool geode_polygon_query(struct geode *g, geodePointPtr points, int n);
+bool rectangle_intersects_geode(struct geode *g, GeoCoord *query, int geode_num);
+bool polygon_intersects_geode(struct geode *g, const struct spatial_range *c, int n, int count);
 
 #endif

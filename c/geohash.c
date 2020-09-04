@@ -325,7 +325,6 @@ char** geohash_neighbors(char *hash) {
         neighbors[5] = get_neighbor(neighbors[4], WEST);                
         neighbors[6] = get_neighbor(hash, WEST);
         neighbors[7] = get_neighbor(neighbors[6], NORTH);        
-
     }
     
     return neighbors;

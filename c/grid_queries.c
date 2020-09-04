@@ -1,7 +1,8 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "geode.h"
-#include "gd.h"
-
+#include "geohash.h"
+#include "grid_queries.h"
 
 /**
  * Returns a list of geohashes in the grid that have data and are contained in the query.
@@ -49,7 +50,7 @@ char** matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
       /*Count increases no matter what and we add the geode to our complete list */
       hashes = count != 0 ? realloc(hashes, sizeof(char *) * (count + 1)) : hashes;
       hashes[count++] = curr;
-      if (geode_query(g, bbox, count)) {
+      if (rectangle_intersects_geode(g, bbox, count)) {
         match_hashes = match_count != 0 ? realloc(match_hashes, sizeof(char *) * (match_count + 1)) : match_hashes;
         match_hashes[match_count++] = strdup(curr);
       }
@@ -89,7 +90,6 @@ char** matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
   return match_hashes;
 }
 
-
 /**
  * Check if any geohashes in the grid that have data and are contained in the query.
  * 
@@ -126,7 +126,7 @@ bool has_matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
     if (g != NULL) {
       /*Count increases no matter what and the geode is added to the complete list */
       count++;
-      if (geode_query(g, bbox, count)) {
+      if (rectangle_intersects_geode(g, bbox, count)) {
         return true;
       }
     }
@@ -159,15 +159,28 @@ bool has_matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
   return false;
 }
 
-void matching_grid_cells_polygon(struct geode *grid)
-{
-    geodePointPtr points = (geodePointPtr)calloc(3, sizeof(gdPoint));
-    points[0].x = 10;
-	points[0].y = 10;
-	points[1].x = 50;
-	points[1].y = 70;
-	points[2].x = 90;
-	points[2].y = 30;
-
-    geode_polygon_query(grid, points, 3);
+/**
+ * Function: matching_grid_cells_polygon
+ * Purpose: find grid cells have have data for any portion of the query
+ *
+ * @param grid   - head of hashmap
+ *        coords - list of coordinates
+ *        n      - number of coordinate pairs
+ */
+char** matching_grid_cells_polygon(struct geode *grid, const struct spatial_range *coords, int n) {
+    /* Geodes that have data and are also within the query */
+    char **match_hashes = calloc(1, sizeof(char *));
+    int match_count = 0;
+    int count = 0;
+    struct geode *g;
+    for(g=grid; g != NULL; g=g->hh.next) {
+        if (polygon_intersects_geode(g, coords, n, count++)) {
+            match_hashes = match_count != 0 ? realloc(match_hashes, sizeof(char *) * (match_count + 1)) : match_hashes;
+            match_hashes[match_count++] = strdup(g->prefix);
+        }
+    }
+    /* NULL termniate the list of matches */
+    match_hashes = realloc(match_hashes, sizeof(char *) * (match_count + 1));
+    match_hashes[match_count] = NULL;
+    return match_hashes;
 }

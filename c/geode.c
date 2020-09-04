@@ -8,6 +8,9 @@
 #include "geohash.h"
 #include "bitmap_graphics.h"
 
+
+static void query_transform(roaring_bitmap_t *r, struct geode *g, const struct spatial_range *coords, int n);
+
 /**
  * Create a geode with a base hash and precision of bitmap
  *
@@ -161,6 +164,31 @@ unsigned int geode_sprange_to_idx(
 }
 
 /**
+ * Converts a coordinate pair (defined with latitude, longitude in decimal
+ * degrees) to an x, y location in the grid.
+ *
+ * @param coords the Coordinates to convert.
+ *
+ * @return Corresponding x, y location in the grid.
+ */
+geodePoint geode_coord_to_xy(
+        struct geode *g, const struct spatial_range *sr)
+{
+
+    /* Assuming (x, y) coordinates for the geoavailability grids, latitude
+     * will decrease as y increases, and longitude will increase as x
+     * increases. This is reflected in how we compute the differences
+     * between the base points and the coordinates in question. */
+    float xDiff = sr->longitude - g->base_range.west;
+    float yDiff = g->base_range.north - sr->latitude;
+
+    geodePoint point;
+    point.x = (int) (xDiff / g->x_px);
+    point.y = (int) (yDiff / g->y_px);
+    return point;
+}
+
+/**
  * Query a geode's bitmap
  *
  * @param g     - geode to query
@@ -168,7 +196,7 @@ unsigned int geode_sprange_to_idx(
  *
  * @return true if any portion of g's bitmap is set and contained in the query
  */
-bool geode_query(struct geode *g, GeoCoord *query, int geode_num) {
+bool rectangle_intersects_geode(struct geode *g, GeoCoord *query, int geode_num) {
   if (g == NULL) {
     return false;
   }
@@ -200,8 +228,8 @@ bool geode_query(struct geode *g, GeoCoord *query, int geode_num) {
   char f_whole[128];
   char f_query[128];
 
-  *(f_whole + sprintf(f_whole, "whole_%d.pbm", geode_num)) = '\0';
-  *(f_query + sprintf(f_query, "query_%d.pbm", geode_num)) = '\0';
+  *(f_whole + sprintf(f_whole, "./pbm/whole_%d.pbm", geode_num)) = '\0';
+  *(f_query + sprintf(f_query, "./pbm/query_%d.pbm", geode_num)) = '\0';
 
   print_pbm(r, g->width, g->height, f_query);
   print_pbm(g->bmp, g->width, g->height, f_whole);
@@ -209,14 +237,45 @@ bool geode_query(struct geode *g, GeoCoord *query, int geode_num) {
   return roaring_bitmap_intersect(g->bmp, r);
 }
 
-bool geode_polygon_query(struct geode *g, geodePointPtr points, int n) {
-	roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(100 * 100);
-    char* f_query = "polygon_query.pbm";
-	bmp_filled_polygon(r, points, n, 100, 100);
-    for (int i = 0; i < n; i++) {
-        printf("x: %d y: %d\n", points[i].x, points[i].y);
-    }
-    print_pbm(r, 100, 100, f_query);
-	free(points);
+bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coords, int n, int count) {
+    roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(g->width * g->height);
+
+
+    query_transform(r, g, coords, n);
+    
+    /*
+    char f_whole[128];
+    char f_query[128];
+
+    *(f_whole + sprintf(f_whole, "./pbm/poly_whole_%s.pbm", g->prefix)) = '\0';
+    *(f_query + sprintf(f_query, "./pbm/poly_query_%s.pbm", g->prefix)) = '\0';
+    print_pbm(r, g->width, g->height, f_query);
+    print_pbm(g->bmp, g->width, g->height, f_whole);
+    */
+
     return roaring_bitmap_intersect(g->bmp, r);
+}
+
+/**
+ * Function: query_transform
+ *
+ * Purpose:  Resolve the set of latitude/longitude coordinates in the query 
+ *           with the coordinates of the geode. 
+ *
+ *           Convert each point to an xy location in the bitmap, 
+ *           then draw the filled polygon with the set of xy pairs.
+ *
+ * @param    r - The bitmap to draw the polygon query into
+ *           g - The geode that the bitmap should be drawn for. If any part of the polygon is
+ *               outside this geode's spatial range, that part of the polygon will be clipped
+ *           c - Set of latitude and longitude coordinates
+ *           n - number of coordinates
+ */
+void query_transform(roaring_bitmap_t *r, struct geode *g, const struct spatial_range *c, int n) {
+    geodePointPtr points = (geodePointPtr)calloc(n, sizeof(geodePoint));
+    for (int i = 0; i < n; i++) {
+        points[i] = geode_coord_to_xy(g, &c[i]);
+    }
+    bmp_filled_polygon(r, points, n, g->width, g->height);
+    free(points);
 }
