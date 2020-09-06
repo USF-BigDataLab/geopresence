@@ -8,7 +8,6 @@
 #include "geohash.h"
 #include "bitmap_graphics.h"
 
-
 static void query_transform(roaring_bitmap_t *r, struct geode *g, const struct spatial_range *coords, int n);
 
 /**
@@ -189,61 +188,14 @@ geodePoint geode_coord_to_xy(
 }
 
 /**
- * Query a geode's bitmap
- *
- * @param g     - geode to query
- * @param query - the query as a GeoCoord
- *
- * @return true if any portion of g's bitmap is set and contained in the query
+ * Function: polygon_intersects_geode
  */
-bool rectangle_intersects_geode(struct geode *g, GeoCoord *query, int geode_num) {
-  if (g == NULL) {
-    return false;
-  }
-  
-  struct spatial_range *base = &g->base_range;
-
-  /* Pick correct bounds for this geode's bitmap given the query */
-  double west = base->west < query->west ? query->west : base->west;
-  double north = base->north > query->north ? query->north : base->north;
-  double east = base->east < query->east ? base->east : query->east;
-  double south = base->south < query->south ? query->south : base->south;
-  
-  /* Find number of bits in each direction to check and starting point */
-  struct spatial_range new  = { 0 };
-  new.longitude = west;
-  new.latitude = north;
-  unsigned int x_bits = fabs(west - east) / g->x_px;
-  unsigned int y_bits = fabs(north - south) / g->y_px;
-  unsigned int start = geode_sprange_to_idx(g, &new);
-  
-  roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(g->width * g->height);
-
-  /* Find if any portion of the query is set in this geode's bitmap */
-  for (int i = 0; i < y_bits; i++) {
-    roaring_bitmap_add_range(r, start, start + x_bits);
-    start += g->width;
-  }
-
-  char f_whole[128];
-  char f_query[128];
-
-  *(f_whole + sprintf(f_whole, "./pbm/whole_%d.pbm", geode_num)) = '\0';
-  *(f_query + sprintf(f_query, "./pbm/query_%d.pbm", geode_num)) = '\0';
-
-  print_pbm(r, g->width, g->height, f_query);
-  print_pbm(g->bmp, g->width, g->height, f_whole);
-
-  return roaring_bitmap_intersect(g->bmp, r);
-}
-
 bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coords, int n, int count) {
     roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(g->width * g->height);
 
 
     query_transform(r, g, coords, n);
     
-    /*
     char f_whole[128];
     char f_query[128];
 
@@ -251,7 +203,6 @@ bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coord
     *(f_query + sprintf(f_query, "./pbm/poly_query_%s.pbm", g->prefix)) = '\0';
     print_pbm(r, g->width, g->height, f_query);
     print_pbm(g->bmp, g->width, g->height, f_whole);
-    */
 
     return roaring_bitmap_intersect(g->bmp, r);
 }

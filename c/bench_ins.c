@@ -55,14 +55,6 @@ int main(int argc, char *argv[])
         geode_add_geohash(instance, line);
     }
 
-    char *test = "d";
-    
-    GeoCoord coord = geohash_decode(test);
-    coord.north = 44;
-    coord.east = -66;
-    coord.south = 30;
-    coord.west = -89;
-
     struct spatial_range *points = (struct spatial_range*) calloc(3, sizeof(struct spatial_range));
 	points[0].longitude = -70;
 	points[0].latitude = 30;
@@ -73,13 +65,7 @@ int main(int argc, char *argv[])
 	points[2].longitude = -88;
 	points[2].latitude = 34;
 
-
-    // Rectangle query
-   // char** res = matching_grid_cells(instances, &coord);
-   // print_strings_and_free(res);
-
-    // Polygon query
-    char** poly_res = matching_grid_cells_polygon(instances, points, 3);
+    char** poly_res = matching_grid_cells(instances, points, 3);
     print_strings_and_free(poly_res);
 
     double end = timer_now();

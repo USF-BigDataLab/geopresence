@@ -41,11 +41,6 @@
 #define LON_RANGE 180
 /* -- */
 
-#define MAX_LAT             90.0
-#define MIN_LAT             -90.0
-
-#define MAX_LONG            180.0
-#define MIN_LONG            -180.0
 
 #define LENGTH_OF_DEGREE	111100				// meters
 

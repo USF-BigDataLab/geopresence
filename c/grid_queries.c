@@ -4,6 +4,8 @@
 #include "geohash.h"
 #include "grid_queries.h"
 
+static void mbr_of_poly(const struct spatial_range *poly, struct spatial_range *mbr, int n);
+
 /**
  * Returns a list of geohashes in the grid that have data and are contained in the query.
  *
@@ -12,12 +14,14 @@
  *
  * @return list of matching grid cells that contain data
  */
-char** matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
+char** matching_grid_cells(struct geode *grid, const struct spatial_range *poly, int n) {
+  struct spatial_range mbr;
+  mbr_of_poly(poly, &mbr, n);
 
   /* Geodes in the system that bound this search */
-  char *north_w = geohash_encode(bbox->north, bbox->west, PREFIX_SZ);
-  char *north_e = geohash_encode(bbox->north, bbox->east, PREFIX_SZ);
-  char *south_e = geohash_encode(bbox->south, bbox->east, PREFIX_SZ);
+  char *north_w = geohash_encode(mbr.north, mbr.west, PREFIX_SZ);
+  char *north_e = geohash_encode(mbr.north, mbr.east, PREFIX_SZ);
+  char *south_e = geohash_encode(mbr.south, mbr.east, PREFIX_SZ);
   
   /* All geodes within the query */
   char **hashes = calloc(1, sizeof(char *));
@@ -50,7 +54,7 @@ char** matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
       /*Count increases no matter what and we add the geode to our complete list */
       hashes = count != 0 ? realloc(hashes, sizeof(char *) * (count + 1)) : hashes;
       hashes[count++] = curr;
-      if (rectangle_intersects_geode(g, bbox, count)) {
+      if (polygon_intersects_geode(g, poly, n, count)) {
         match_hashes = match_count != 0 ? realloc(match_hashes, sizeof(char *) * (match_count + 1)) : match_hashes;
         match_hashes[match_count++] = strdup(curr);
       }
@@ -98,11 +102,14 @@ char** matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
  *
  * @return true if any matching grid cells contain data
  */
-bool has_matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
+bool has_matching_grid_cells(struct geode *grid, const struct spatial_range *poly, int n) {
+  struct spatial_range mbr;
+  mbr_of_poly(poly, &mbr, n);
+
   /* Geodes in the system that bound this search */
-  char *north_w = geohash_encode(bbox->north, bbox->west, PREFIX_SZ);
-  char *north_e = geohash_encode(bbox->north, bbox->east, PREFIX_SZ);
-  char *south_e = geohash_encode(bbox->south, bbox->east, PREFIX_SZ);
+  char *north_w = geohash_encode(mbr.north, mbr.west, PREFIX_SZ);
+  char *north_e = geohash_encode(mbr.north, mbr.east, PREFIX_SZ);
+  char *south_e = geohash_encode(mbr.south, mbr.east, PREFIX_SZ);
   
   /* Count of all geodes within the query bounds */
   int count = 0;
@@ -126,7 +133,7 @@ bool has_matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
     if (g != NULL) {
       /*Count increases no matter what and the geode is added to the complete list */
       count++;
-      if (rectangle_intersects_geode(g, bbox, count)) {
+      if (polygon_intersects_geode(g, poly, n, count)) {
         return true;
       }
     }
@@ -159,28 +166,25 @@ bool has_matching_grid_cells(struct geode *grid, GeoCoord *bbox) {
   return false;
 }
 
-/**
- * Function: matching_grid_cells_polygon
- * Purpose: find grid cells have have data for any portion of the query
- *
- * @param grid   - head of hashmap
- *        coords - list of coordinates
- *        n      - number of coordinate pairs
- */
-char** matching_grid_cells_polygon(struct geode *grid, const struct spatial_range *coords, int n) {
-    /* Geodes that have data and are also within the query */
-    char **match_hashes = calloc(1, sizeof(char *));
-    int match_count = 0;
-    int count = 0;
-    struct geode *g;
-    for(g=grid; g != NULL; g=g->hh.next) {
-        if (polygon_intersects_geode(g, coords, n, count++)) {
-            match_hashes = match_count != 0 ? realloc(match_hashes, sizeof(char *) * (match_count + 1)) : match_hashes;
-            match_hashes[match_count++] = strdup(g->prefix);
+static void mbr_of_poly(const struct spatial_range *poly, struct spatial_range *mbr, int n) {
+    mbr->east = MIN_LONG;
+    mbr->west = MAX_LONG;
+    mbr->south = MAX_LAT;
+    mbr->north = MIN_LAT;
+
+    for (int i = 0; i < n; i++) {
+        if (poly[i].longitude < mbr->west) {
+            mbr->west = poly[i].longitude;
+        }
+        if (poly[i].longitude > mbr->east) {
+            mbr->east = poly[i].longitude;
+        }
+        if (poly[i].latitude > mbr->north) {
+            mbr->north = poly[i].latitude;
+        }
+        if (poly[i].latitude < mbr->south) {
+            mbr->south = poly[i].latitude;
         }
     }
-    /* NULL termniate the list of matches */
-    match_hashes = realloc(match_hashes, sizeof(char *) * (match_count + 1));
-    match_hashes[match_count] = NULL;
-    return match_hashes;
-}
+    printf("MBR North: %f West: %f South: %f East: %f\n", mbr->north, mbr->west, mbr->south, mbr->east);
+} 
