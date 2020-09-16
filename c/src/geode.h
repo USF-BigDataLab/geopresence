@@ -25,6 +25,10 @@ typedef struct {
 }
 geodePoint, *geodePointPtr;
 
+struct query_result {
+    uint32_t *locations;
+    uint64_t sz;
+};
 
 void geode_add_geohash(struct geode *g, const char *geohash);
 void geode_add_sprange(struct geode *g, const struct spatial_range *sr);

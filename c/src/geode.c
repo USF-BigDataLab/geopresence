@@ -1,3 +1,6 @@
+#include <_types/_uint32_t.h>
+#include <_types/_uint64_t.h>
+#include <malloc/_malloc.h>
 #include <math.h>
 #include <stdio.h>
 
@@ -206,6 +209,36 @@ bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coord
 
     return roaring_bitmap_intersect(g->bmp, r);
 }
+
+/**
+ * Function: polygon_query_geode
+ * Purpose:  get the index locations that are set in g and contained in the bounds of coords
+ * Params:   g      - the geode to query
+ *           coords - the polygon represented as lat/lon pairs
+ *           n      - number of lat/lon pairs
+ *
+ * Return:   locations_and_sz - array of matching locations and the size of the array.
+ *                              the size is determined with roaring_bitmap_get_cardinality
+ */
+struct query_result* polygon_query_geode(struct geode *g, const struct spatial_range *coords, int n) {
+    /* Transform the polygon query into a roaring_bitmap_t */
+    roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(g->width * g->height);
+    query_transform(r, g, coords, n);
+   
+    /* convert the intersecting grid cells of the geode and the query to and array of matching index locations */
+    roaring_bitmap_and_inplace(r, g->bmp);
+    uint64_t sz = roaring_bitmap_get_cardinality(r);
+    uint32_t *locations = calloc(sz, sizeof(uint32_t));
+    roaring_bitmap_to_uint32_array(r, locations);
+
+    /* expose the number of index locations in the array */
+    struct query_result *locations_and_sz = malloc(sizeof(struct query_result));
+    locations_and_sz->locations = locations;
+    locations_and_sz->sz = sz;
+
+    return locations_and_sz;
+}
+
 
 /**
  * Function: query_transform
