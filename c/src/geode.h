@@ -57,5 +57,6 @@ void geode_free(struct geode *g);
 int geode_xy_to_idx(struct geode *g, int x, int y);
 bool rectangle_intersects_geode(struct geode *g, GeoCoord *query, int geode_num);
 bool polygon_intersects_geode(struct geode *g, const struct spatial_range *c, int n, int count);
+struct query_result* polygon_query_geode(struct geode *g, const struct spatial_range *c, int n);
 
 #endif

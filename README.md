@@ -70,9 +70,37 @@ Results Collected:
 
 ### Queries in C
 
-In the current C implementation, a rectangular spatial range can act as the argument for a query. The spatial grid is searched for cells contained in the query and then the grid cell is searched for matching bits. Currently there is a query that returns wether data is in *any* of the grid cells, and one that returns a list of every matching grid cell. This algorithm was verified by rendering the grid cells and corresponding query cells in photoshop. 
+Before describing functionality, it will be helpful to clearly define terminology. 
 
-This has not been benchmarked yet and needs to be. 
+The `grid` is a hashmap of geohashes to `geode`. 
+
+A `geode` is a struct containing a spatial range and metadata about the spatial range. 
+
+Both the `grid` and the `geodes` can be queried with a set of latitude longitude coordinates representing a polygon. 
+
+[Roaring bitmaps](https://github.com/RoaringBitmap/CRoaring) are used to index data for each `geode`.
+
+The algorithm for drawing polygons was taken from [libgd](https://github.com/libgd/libgd) and modified for [roaring bitmaps](https://github.com/RoaringBitmap/CRoaring).
+
+##### Grid queries
+
+
+There is functionality for determining 
+
+1. If *any* geodes in the grid match the query
+2. *Which* geodes in the grid match the query.
+
+##### Geode queries
+
+Any part of the query that lies outside of the spatial range of the geode is clipped.
+
+There is functionality for determining 
+
+1. If *any* bits set in the `geode`'s bitmap match the query. 
+2. *Which* bits in the `geode`'s bitmap match the query. 
+
+
+This has not been benchmarked yet and needs to be.
 
 ## Task 2: Probabilistic Point Density Estimation
 
