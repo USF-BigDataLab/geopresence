@@ -84,11 +84,11 @@ The algorithm for drawing polygons was taken from [libgd](https://github.com/lib
 
 ##### Grid queries
 
+There is functionality for determining
 
-There is functionality for determining 
-
-1. If *any* geodes in the grid match the query
-2. *Which* geodes in the grid match the query.
+1. *Which* geodes in the grid are contained in the query.
+2. *Which* geodes in the grid are contained in the query and have data.
+3. If *any* geodes in the grid are contained in the query and have data.
 
 ##### Geode queries
 
@@ -96,8 +96,8 @@ Any part of the query that lies outside of the spatial range of the geode is cli
 
 There is functionality for determining 
 
-1. If *any* bits set in the `geode`'s bitmap match the query. 
-2. *Which* bits in the `geode`'s bitmap match the query. 
+1. If *any* bits set in the `geode`'s bitmap are contained in the query. 
+2. *Which* bits in the `geode`'s bitmap are contained in the query. 
 
 
 This has not been benchmarked yet and needs to be.

@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
     }
 
     char line[128];
-    double start = timer_now();
     while (fgets(line, 128, fp) != NULL) {
         char prefix[PREFIX_SZ + 1] = { '\0' };
         memcpy(prefix, line, PREFIX_SZ);
@@ -65,10 +64,13 @@ int main(int argc, char *argv[])
 	points[2].longitude = -88;
 	points[2].latitude = 34;
 
-    char** poly_res = matching_grid_cells(instances, points, 3);
-    print_strings_and_free(poly_res);
-
+    double start = timer_now();
+    char** poly_res_match = matching_geodes(instances, points, 3);
+    char** poly_res = geodes(instances, points, 3);
     double end = timer_now();
+
+    print_strings_and_free(poly_res_match);
+    print_strings_and_free(poly_res);
     printf("%f\n", end - start);
 
     fclose(fp);

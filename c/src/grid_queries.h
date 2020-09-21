@@ -4,7 +4,8 @@
 #include "geohash.h"
 #include "geode.h"
 
-bool has_matching_grid_cells(struct geode *grid, const struct spatial_range *poly, int n);
-char** matching_grid_cells(struct geode *grid, const struct spatial_range *poly, int n);
+char** geodes(struct geode *grid, const struct spatial_range *poly, int n);
+char** matching_geodes(struct geode *grid, const struct spatial_range *poly, int n);
+bool has_matching_geodes(struct geode *grid, const struct spatial_range *poly, int n);
 
 #endif
