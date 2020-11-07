@@ -199,6 +199,7 @@ bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coord
 
     query_transform(r, g, coords, n);
     
+    /*
     char f_whole[128];
     char f_query[128];
 
@@ -206,6 +207,7 @@ bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coord
     *(f_query + sprintf(f_query, "./pbm/poly_query_%s.pbm", g->prefix)) = '\0';
     print_pbm(r, g->width, g->height, f_query);
     print_pbm(g->bmp, g->width, g->height, f_whole);
+    */
 
     return roaring_bitmap_intersect(g->bmp, r);
 }

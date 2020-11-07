@@ -10,17 +10,6 @@
 
 struct geode *instances = NULL;
 
-void print_strings_and_free(char **strings) {
-    char** save = strings;
-    printf("\n");
-    for (int i = 0; *(strings) != NULL; i++) {
-      printf("%s, ", *strings);
-      free(*strings);
-      strings++;
-    }
-    free(save);
-}
-
 int main(int argc, char *argv[])
 {
     if (argc != 2) {
@@ -39,6 +28,7 @@ int main(int argc, char *argv[])
     }
 
     char line[128];
+    double start = timer_now();
     while (fgets(line, 128, fp) != NULL) {
         char prefix[PREFIX_SZ + 1] = { '\0' };
         memcpy(prefix, line, PREFIX_SZ);
@@ -54,23 +44,8 @@ int main(int argc, char *argv[])
         geode_add_geohash(instance, line);
     }
 
-    struct spatial_range *points = (struct spatial_range*) calloc(3, sizeof(struct spatial_range));
-	points[0].longitude = -70;
-	points[0].latitude = 30;
-
-	points[1].longitude = -85;
-	points[1].latitude = 36;
-
-	points[2].longitude = -88;
-	points[2].latitude = 34;
-
-    double start = timer_now();
-    char** poly_res_match = matching_geodes(instances, points, 3);
-    char** poly_res = geodes(instances, points, 3);
     double end = timer_now();
 
-    print_strings_and_free(poly_res_match);
-    print_strings_and_free(poly_res);
     printf("%f\n", end - start);
 
     fclose(fp);

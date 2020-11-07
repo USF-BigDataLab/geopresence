@@ -33,3 +33,18 @@ The speed differential in the NOAA benchmarks can largely be explained by (1) op
     \label{fig:mem}
 \end{figure}
 
+\subsection{Querying}
+
+To measure query performance, we compared the query time of GEODE with the Geoavailability Grid implementation provided in Galileo \cite{malensek2013polygon}. This included the following benchmarks:
+
+\begin{description}
+\item[Random Location:] Entries in observational data streams generally do not exhibit predictable ordering or insertion sequences; this benchmark involved choosing random $(x, y)$ coordinates from a uniform distribution and inserting them into the index. The index was then queried with a polygon that only spans one geohash so that only one bitmap intersection is performed.
+\end{description}
+
+\begin{figure}
+    \centerline{\includegraphics[width=\linewidth]{query.pdf}}
+    \caption{Average query time of GEODE and Geoavailability Grids after random insertion. GEODE has significantly reduced query time (also benchmark rtree here).}
+    \label{fig:mem}
+\end{figure}
+
+
