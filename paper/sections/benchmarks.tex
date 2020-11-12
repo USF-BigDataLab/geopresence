@@ -42,9 +42,7 @@ To measure query performance, we compared the query time of GEODE with the Geoav
 \end{description}
 
 \begin{figure}
-    \centerline{\includegraphics[width=\linewidth]{query.pdf}}
-    \caption{Average query time of GEODE and Geoavailability Grids after random insertion. GEODE has significantly reduced query time (also benchmark rtree here).}
+    \centerline{\includegraphics[width=\linewidth]{query_scatter.pdf}}
+    \caption{Mean query time of GEODE and Geoavailability Grids after random insertions. GEODE has significantly better query performance compared to the rbang rtree variant, especially with larger data sets. GEODE query time stays consistent regardless of how much data is stored whereas rtree query time increases as data increases. Bitmap resolution does affect GEODE query time, but high resolution bitmaps still beat rtrees with larger datasets.}
     \label{fig:mem}
 \end{figure}
-
-
