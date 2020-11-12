@@ -1,11 +1,8 @@
-#include "timer.h"
+#include <sys/time.h>
+#include <stddef.h>
 
-#include <time.h>
-
-double timer_now(void)
-{
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-    return ts.tv_nsec / 1000000000.0 + ts.tv_sec;
+double timer_now(void) {
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return (t.tv_sec * 1000.0) + (t.tv_usec/1000.0);
 }
-

@@ -19,7 +19,6 @@ int main(int argc, char** argv) {
     }
 
     long insertions = atol(argv[1]);
-    printf("Inserting %ld random points\n", insertions);
 
     struct geode *g = geode_create("9x", TEST_PRECISION);
 
@@ -38,8 +37,6 @@ int main(int argc, char** argv) {
 
 	points[2].latitude = 41.271;
 	points[2].longitude = -111.421;
-
-    printf("Searching %ld random points\n", insertions);
 
     double start = timer_now();
     polygon_intersects_geode(g, points, 3, 0);

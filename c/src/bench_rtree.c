@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "geode.h"
+#include "geohash.h"
 #include "rtree.h"
+#include "timer.h"
 
 struct city {
     char *name;
@@ -9,49 +13,57 @@ struct city {
     double lon;
 };
 
-struct city phx = { .name = "Phoenix", .lat = 33.448, .lon = -112.073 };
-struct city enn = { .name = "Ennis", .lat = 52.843, .lon = -8.986 };
-struct city pra = { .name = "Prague", .lat = 50.088, .lon = -14.420 };
-struct city tai = { .name = "Taipei", .lat = 25.033, .lon = 121.565 };
-struct city her = { .name = "Hermosillo", .lat = 29.102, .lon = -110.977 };
-struct city him = { .name = "Himeji", .lat = 34.816, .lon = 134.700 };
+/* Number of matches found in the search */
+int match_count;
 
 bool city_iter(const double *rect, const void *item, void *udata) {
-    const struct city *city = item;
-    printf("%s\n", city->name);
+    match_count++;
+    // This always prints 0.0 0.0 - the lat/lon values get lost somewhere?
     return true;
 }
 
-int main() {
-    // create a new rtree where each item is a `struct city*`. 
-    struct rtree *tr = rtree_new(sizeof(struct city*), 2);
+/**
+ * Generate a random double between low and high
+ */
+double drand(double low, double high) {
+    return ((double)rand() * ( high - low )) / (double)RAND_MAX + low;
+}
 
-    // load some cities into the rtree. Each set operation performs a copy of 
-    // the data that is pointed to in the second and third arguments. 
-    // The R-tree expects a rectangle, which is an array of doubles, that
-    // has the first N values as the minimum corner of the rect, and the next
-    // N values as the maximum corner of the rect, where N is the number of
-    // dimensions provided to rtree_new(). For points the the min and max
-    // values should match.
-    rtree_insert(tr, (double[]){ phx.lon, phx.lat, phx.lon, phx.lat }, &phx);
-    rtree_insert(tr, (double[]){ enn.lon, enn.lat, enn.lon, enn.lat }, &enn);
-    rtree_insert(tr, (double[]){ pra.lon, pra.lat, pra.lon, pra.lat }, &pra);
-    rtree_insert(tr, (double[]){ tai.lon, tai.lat, tai.lon, tai.lat }, &tai);
-    rtree_insert(tr, (double[]){ her.lon, her.lat, her.lon, her.lat }, &her);
-    rtree_insert(tr, (double[]){ him.lon, him.lat, him.lon, him.lat }, &him);
-    
-    printf("\n-- Northwestern cities --\n");
-    rtree_search(tr, (double[]){ -180, 0, 0, 90 }, city_iter, NULL);
+int main(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr,
+                "Usage: %s insertions\n"
+                "Ex: %s 1000000\n",
+                argv[0], argv[0]);
+        return EXIT_FAILURE;
+    }
 
-    printf("\n-- Northeastern cities --\n");
-    rtree_search(tr, (double[]){ 0, 0, 180, 90 }, city_iter, NULL);
+    long insertions = atol(argv[1]);
 
-    // deleting an item is the same inserting
-    rtree_delete(tr, (double[]){ phx.lon, phx.lat, phx.lon, phx.lat }, &phx);
+    struct spatial_range sr;
+    geohash_decodeN(&sr, "9x");
+    // create a new rtree where each item is a `struct city`. 
+    struct rtree *tr = rtree_new(sizeof(struct city), 2);
 
-    printf("\n-- Northwestern cities --\n");
-    rtree_search(tr, (double[]){ -180, 0, 0, 90 }, city_iter, NULL);
+    for (int i = 0; i < insertions; ++i) {
+        struct city *p = malloc(sizeof(struct city));
+        double rand_x = drand(sr.west, sr.east);
+        double rand_y = drand(sr.south, sr.north);
+        p->lat = rand_y;
+        p->lon = rand_x;
+        p->name = "9x";
+        //uncomment to print randomly generated lat/lon coordinates in 9x
+        //printf("%f %f\n", rand_y, rand_x);
+        rtree_insert(tr, (double[]){ rand_x, rand_y, rand_x, rand_y } , p);
+    }
+
+    // This finds none of what was inserted even though everything that was inserted
+    // should be in the bounds of this rectangle
+    match_count = 0;
+    double start = timer_now();
+    rtree_search(tr, (double[]){sr.west, sr.south, sr.east, sr.north}, city_iter, NULL);
+    printf("%f\n", timer_now() - start);
+
 
     rtree_free(tr);
-
 }

@@ -1,8 +1,6 @@
-#include <_types/_uint32_t.h>
-#include <_types/_uint64_t.h>
-#include <malloc/_malloc.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "log.h"
 #include "geode.h"
