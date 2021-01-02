@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #define TEST_PRECISION 16
+#define TEST_HASH_SZ 2
 
 int main(int argc, char** argv) {
 
@@ -20,7 +21,7 @@ int main(int argc, char** argv) {
 
     long insertions = atol(argv[1]);
 
-    struct geode *g = geode_create("9x", TEST_PRECISION);
+    struct geode *g = geode_create("9x", TEST_PRECISION, TEST_HASH_SZ);
 
     for (int i = 0; i < insertions; ++i) {
         int rand_x = (rand() / ((double) RAND_MAX + 1)) * (g->width + 1);
@@ -39,7 +40,7 @@ int main(int argc, char** argv) {
 	points[2].longitude = -111.421;
 
     double start = timer_now();
-    polygon_intersects_geode(g, points, 3, 0);
+    polygon_intersects_geode(g, points, 3);
     double end = timer_now();
     printf("%f\n", end - start);
 

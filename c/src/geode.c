@@ -1,7 +1,11 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <openssl/sha.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "c.h"
 #include "log.h"
 #include "geode.h"
 #include "roaring.c"
@@ -15,9 +19,9 @@ static void query_transform(roaring_bitmap_t *r, struct geode *g, const struct s
  * Create a geode with a base hash and precision of bitmap
  *
  * @param base_geohash - starting hash
- * @param print_geode  - precision of bitmap for the geode
+ * @param precision  - precision of bitmap for the geode
  */
-struct geode *geode_create(char *base_geohash, unsigned int precision)
+struct geode *geode_create(const char *base_geohash, unsigned int precision, unsigned int hash_sz)
 {
     struct geode *g = malloc(sizeof(struct geode));
     if (g == NULL) {
@@ -25,10 +29,14 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
         return NULL;
     }
 
-    memcpy(g->prefix, base_geohash, PREFIX_SZ);
-    g->prefix[PREFIX_SZ] = '\0';
+
+    memcpy(g->prefix, base_geohash, hash_sz);
+    g->prefix[hash_sz] = '\0';
+    g->prefix_sz = hash_sz;
+    g->num_sgs = 0;
 
     geohash_decodeN(&g->base_range, g->prefix);
+    g->hll = HLL_create(9, &g->opt_error);
 
     /*
      * height, width calculation:
@@ -55,6 +63,8 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
     g->x_px = g->x_deg / (double) g->width;
     g->y_px = g->y_deg / (double) g->width;
 
+    g->total = 0;
+
     LOG("New GEODE: %s (%d x %d), dpp: (%f, %f)\n",
             g->prefix,
             g->width,
@@ -65,22 +75,79 @@ struct geode *geode_create(char *base_geohash, unsigned int precision)
     return g;
 }
 
-void geode_add_geohash(struct geode *g, const char *geohash)
-{
+double geode_load_factor(struct geode *g) {
+    return (1 - ((double) HLL_estimate(g->hll) / (double) g->total));
+}
+
+uint64_t hash(int i) {
+    // Structure that is 160 bits wide used to extract 64 bits from a SHA-1.
+    struct hashval {
+    uint64_t high64;
+    char     low96[12];
+    } hash;
+
+    // Calculate the SHA-1 hash of the integer.
+    SHA_CTX ctx;
+    SHA1_Init(&ctx);
+    SHA1_Update(&ctx, (unsigned char*)&i, sizeof(i));
+    SHA1_Final((unsigned char*)&hash, &ctx);
+    // Return 64 bits of the hash.
+    return hash.high64;
+}
+
+
+/**
+ * Add a data point to a geode. Search for and create sub-geodes when geode is appropriately dense.
+ *
+ * @param g       - geode to add data to
+ * @param geohash - geohash to be added to the geode
+ */
+void geode_add_geohash(struct geode *g, const char *geohash) {
     struct spatial_range sr;
+    struct geode *gx = g;
+
+    double lf = geode_load_factor(g);
+   
+    /* Check if geode is dense */
+    if (lf > .6) {
+        LOG("Load factor breached -> %s -> %f -> %s\n", g->prefix, lf, geohash);
+        char sub_hash[g->prefix_sz + 2];
+        memcpy(sub_hash, geohash, g->prefix_sz + 1);
+        sub_hash[g->prefix_sz + 2] = '\0';
+        /* Find the sub geode to place new data */
+        for (int i = 0; i < g->num_sgs; i++) {
+            if (strncmp(g->sgs[i]->prefix, sub_hash, g->prefix_sz + 1) == 0) {
+                LOG("Found sub geode -> %s\n", g->sgs[i]->prefix);
+                /* Add data point to sub geode and return */
+                geode_add_geohash(g->sgs[i], geohash);
+                return;
+            }
+        }
+        /* If sub geode wasn't found and it will be at most 10 characters in length, create it */
+        if (g->prefix_sz < 10) {
+            g->sgs[g->num_sgs] = geode_create(geohash, 16, g->prefix_sz + 1);
+            LOG("Created sub geode -> %s -> sz %d\n", g->sgs[g->num_sgs]->prefix, g->sgs[g->num_sgs]->prefix_sz);
+            gx = g->sgs[g->num_sgs];
+            g->num_sgs++;
+        }
+    }
+    /* Add data point to the geode */
     geohash_decodeN(&sr, geohash);
-    geode_add_sprange(g, &sr);
+    geodePoint p = geode_sprange_to_point(gx, &sr);
+    geode_add_xy(gx, p.x, p.y);
 }
 
-void geode_add_sprange(struct geode *g, const struct spatial_range *sr)
-{
-    unsigned int idx = geode_sprange_to_idx(g, sr);
-    roaring_bitmap_add(g->bmp, idx);
-}
-
-void geode_add_xy(struct geode *g, const int x, const int y)
-{
+/**
+ * Add an (x,y) point to the geode 
+ *
+ * @param g - geode to add to
+ * @param x - x coord
+ * @param y - y coord
+ */
+void geode_add_xy(struct geode *g, const int x, const int y) {
     unsigned int idx = geode_xy_to_idx(g, x, y);
+    HLL_update(g->hll, hash(idx));
+    g->total++;
     roaring_bitmap_add(g->bmp, idx);
 }
 
@@ -117,27 +184,6 @@ void print_geode(struct geode *gc)
     printf("%s (%f, %f) in [%f, %f, %f, %f]\n", gc->prefix, gc->base_range.longitude, gc->base_range.latitude, gc->base_range.north, gc->base_range.east, gc->base_range.south, gc->base_range.west);
 }
 
-void print_pbm(roaring_bitmap_t *bmp, unsigned int x, unsigned int y, char *file_name) {
-
-  FILE *fp = fopen(file_name, "w");
-  
-  char header[128];
-
-  fputs("P1\n", fp);
-  int null_pos = sprintf(header, "%u %u\n", x, y);
-  header[null_pos] = '\0';
-  fputs(header, fp);
-
-  for (int i = 0; i < x; i++){
-    for (int j = 0; j < y; j++){
-      roaring_bitmap_contains(bmp, i*x + j) ? fputs("1", fp) : fputs("0", fp);
-      fputs(" ", fp);
-    }
-      fputs("\n", fp);
-  }
-  fclose(fp);
-}
-
 /**
  * Converts a coordinate pair (defined with latitude, longitude in decimal
  * degrees) to an x, y location in the grid.
@@ -146,32 +192,7 @@ void print_pbm(roaring_bitmap_t *bmp, unsigned int x, unsigned int y, char *file
  *
  * @return Corresponding x, y location in the grid.
  */
-unsigned int geode_sprange_to_idx(
-        struct geode *g, const struct spatial_range *sr)
-{
-
-    /* Assuming (x, y) coordinates for the geoavailability grids, latitude
-     * will decrease as y increases, and longitude will increase as x
-     * increases. This is reflected in how we compute the differences
-     * between the base points and the coordinates in question. */
-    float xDiff = fabs(sr->longitude - g->base_range.west);
-    float yDiff = fabs(sr->latitude - g->base_range.north);
-
-    const int x = (int) (xDiff / g->x_px);
-    const int y = (int) (yDiff / g->y_px);
-
-    return geode_xy_to_idx(g, x, y);
-}
-
-/**
- * Converts a coordinate pair (defined with latitude, longitude in decimal
- * degrees) to an x, y location in the grid.
- *
- * @param coords the Coordinates to convert.
- *
- * @return Corresponding x, y location in the grid.
- */
-geodePoint geode_coord_to_xy(
+geodePoint geode_sprange_to_point(
         struct geode *g, const struct spatial_range *sr)
 {
 
@@ -190,23 +211,14 @@ geodePoint geode_coord_to_xy(
 
 /**
  * Function: polygon_intersects_geode
+ * Purpose:  check ifany index locations that are set in g are contained in the bounds of coords
+ * Params:   g      - the geode to query
+ *           coords - the polygon represented as lat/lon pairs
+ *           n      - number of lat/lon pairs
  */
-bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coords, int n, int count) {
+bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coords, int n) {
     roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(g->width * g->height);
-
-
     query_transform(r, g, coords, n);
-    
-    /*
-    char f_whole[128];
-    char f_query[128];
-
-    *(f_whole + sprintf(f_whole, "./pbm/poly_whole_%s.pbm", g->prefix)) = '\0';
-    *(f_query + sprintf(f_query, "./pbm/poly_query_%s.pbm", g->prefix)) = '\0';
-    print_pbm(r, g->width, g->height, f_query);
-    print_pbm(g->bmp, g->width, g->height, f_whole);
-    */
-
     return roaring_bitmap_intersect(g->bmp, r);
 }
 
@@ -221,24 +233,22 @@ bool polygon_intersects_geode(struct geode *g, const struct spatial_range *coord
  *                              the size is determined with roaring_bitmap_get_cardinality
  */
 struct query_result* polygon_query_geode(struct geode *g, const struct spatial_range *coords, int n) {
-    /* Transform the polygon query into a roaring_bitmap_t */
     roaring_bitmap_t *r = roaring_bitmap_create_with_capacity(g->width * g->height);
     query_transform(r, g, coords, n);
    
-    /* convert the intersecting grid cells of the geode and the query to and array of matching index locations */
+    /* Convert the intersecting grid cells of the geode and the query to an array of matching index locations */
     roaring_bitmap_and_inplace(r, g->bmp);
     uint64_t sz = roaring_bitmap_get_cardinality(r);
     uint32_t *locations = calloc(sz, sizeof(uint32_t));
     roaring_bitmap_to_uint32_array(r, locations);
 
-    /* expose the number of index locations in the array */
+    /* Expose the number of index locations in the array */
     struct query_result *locations_and_sz = malloc(sizeof(struct query_result));
     locations_and_sz->locations = locations;
     locations_and_sz->sz = sz;
 
     return locations_and_sz;
 }
-
 
 /**
  * Function: query_transform
@@ -258,7 +268,7 @@ struct query_result* polygon_query_geode(struct geode *g, const struct spatial_r
 void query_transform(roaring_bitmap_t *r, struct geode *g, const struct spatial_range *c, int n) {
     geodePointPtr points = (geodePointPtr)calloc(n, sizeof(geodePoint));
     for (int i = 0; i < n; i++) {
-        points[i] = geode_coord_to_xy(g, &c[i]);
+        points[i] = geode_sprange_to_point(g, &c[i]);
     }
     bmp_filled_polygon(r, points, n, g->width, g->height);
     free(points);

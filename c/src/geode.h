@@ -1,14 +1,15 @@
 #ifndef _GEODE_H_
 #define _GEODE_H_
-
+#include "c.h"
 #include "geohash.h"
 #include "roaring.h"
 #include "uthash.h"
 
-#define PREFIX_SZ 2
+#define MAX_PREFIX_SZ 10
 
 struct geode {
-    char prefix[PREFIX_SZ + 1];
+    char prefix[MAX_PREFIX_SZ + 1];
+    int prefix_sz;
     struct spatial_range base_range;
     unsigned int width;
     unsigned int height;
@@ -17,6 +18,11 @@ struct geode {
     double x_px;
     double y_px;
     roaring_bitmap_t *bmp;
+    hll_t *hll;
+    int opt_error;
+    uint64_t total;
+    struct geode *sgs[32];
+    int num_sgs;
     UT_hash_handle hh;
 };
 
@@ -34,11 +40,10 @@ void geode_add_geohash(struct geode *g, const char *geohash);
 void geode_add_sprange(struct geode *g, const struct spatial_range *sr);
 void geode_add_xy(struct geode *g, const int x, const int y);
 
-unsigned int geode_sprange_to_idx(struct geode *g, const struct spatial_range *sr);
-
+double geode_load_factor(struct geode *g);
+geodePoint geode_sprange_to_point(struct geode *g, const struct spatial_range *sr);
 void print_geocoord(GeoCoord *gc);
 void print_geode(struct geode *gc);
-void print_pbm(roaring_bitmap_t *bmp, unsigned int x, unsigned int y, char *file_name);
 
 /**
  * Initializes a new GEODE data structure using the provided base Geohash.
@@ -52,11 +57,12 @@ void print_pbm(roaring_bitmap_t *bmp, unsigned int x, unsigned int y, char *file
  *
  * @return The initialized GEODE.
  */
-struct geode *geode_create(char *base_geohash, unsigned int precision);
+struct geode *geode_create(const char *base_geohash, unsigned int precision, unsigned int hash_sz);
 void geode_free(struct geode *g);
+
 int geode_xy_to_idx(struct geode *g, int x, int y);
 bool rectangle_intersects_geode(struct geode *g, GeoCoord *query, int geode_num);
-bool polygon_intersects_geode(struct geode *g, const struct spatial_range *c, int n, int count);
+bool polygon_intersects_geode(struct geode *g, const struct spatial_range *c, int n);
 struct query_result* polygon_query_geode(struct geode *g, const struct spatial_range *c, int n);
 
 #endif

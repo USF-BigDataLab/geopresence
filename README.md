@@ -25,6 +25,8 @@ The project implementation will be broken down into several tasks. See the follo
 
 We can begin with the geohash dataset from the NOAA [North American Mesoscale Forecast System](https://www.ncdc.noaa.gov/data-access/model-data/model-datasets/north-american-mesoscale-forecast-system-nam). This has many points that overlap, since weather is recorded for particular areas across a grid. We will need to:
 
+* Estimate the density of data already held for the geohash
+* Search for sub geohash or create it if the low resolution hash is appropriately dense
 * Convert geohashes to lat, lon points
 * Map lat, lon points to grid cells (x, y coordinates)
 * Map this grid to a bitmap
@@ -49,7 +51,7 @@ Implementations:
 
 - [X] Random insertion implementation (C + Java)
 
-- [ ] Data load and query (C + JAVA)
+- [X] Data load and query (C + JAVA)
 
 
 Results Collected:
@@ -74,9 +76,9 @@ Before describing functionality, it will be helpful to clearly define terminolog
 
 The `grid` is a hashmap of geohashes to `geode`. 
 
-A `geode` is a struct containing a spatial range and metadata about the spatial range. 
+A `geode` is a struct containing a bitmap representation of where data is in the spatial range.
 
-Both the `grid` and the `geodes` can be queried with a set of latitude longitude coordinates representing a polygon. 
+Both the `grid` and the `geode` can be queried with a set of latitude longitude coordinates representing a polygon. 
 
 [Roaring bitmaps](https://github.com/RoaringBitmap/CRoaring) are used to index data for each `geode`.
 
@@ -87,8 +89,6 @@ The algorithm for drawing polygons was taken from [libgd](https://github.com/lib
 There is functionality for determining
 
 1. *Which* geodes in the grid are contained in the query.
-2. *Which* geodes in the grid are contained in the query and have data.
-3. If *any* geodes in the grid are contained in the query and have data.
 
 ##### Geode queries
 
@@ -99,8 +99,11 @@ There is functionality for determining
 1. If *any* bits set in the `geode`'s bitmap are contained in the query. 
 2. *Which* bits in the `geode`'s bitmap are contained in the query. 
 
+These queries were benchmarked against [RTrees](https://github.com/tidwall/rtree.c) using geodes of 3 different levels of bit precision.
 
-This has not been benchmarked yet and needs to be.
+Each point on the graph is an average of 100 runs.
+
+![Query Benchmark](figures/query_scatter.pdf)
 
 ## Task 2: Probabilistic Point Density Estimation
 
@@ -113,6 +116,32 @@ How to determine "disproportionate?"
 * One or two std devs from mean?
 
 How to integrate into query pipeline? Use point-in-polygon algorithm to determine if the sub-bitmap should be checked?
+
+### Naive Solution
+
+
+* For now it is implemented to look at a particular geodes "load factor", (1 - estimated_unique/total). 
+* If unique points are not disproportionate to the total number of points, then the load factor is low.
+* Geodes are split if a load factor of 60% is breached.
+
+Each geode has one HLL and a list of pointers to sub geodes. Once a load factor of 60% is breached, data will be added to sub geodes instead of the main geode. Currently implemented 
+as a psuedo tail-recursive solution (Once the correct sub geode is found/created, data is added to it and then stack frames are popped but nothing executes on the way back down the stack). 
+Checking the HLL everytime a data point is added also greatly slows down the insertion benchmarks ~1000%. This should still be faster than the Java version but has not been graphed.
+
+TODO: All sub geodes of a geode's tree should be queried for index locations. Intersections would require that all sub geodes are queried as well. Currently only the low resolution bitmap is being queried.
+TODO: The benchmarks for random insertion and querys use geode_add_xy. Only geode_add_geohash does splitting of grid cells and it uses geode_add_xy once appropriate sub geode is found. All benchmarks should use geohashes instead of (x,y) points
+
+##### Pros 
+
+* Easy to implement
+* Easy to understand
+
+##### Cons
+
+* Potential to create unnecessary geodes since each geode only has 1 HLL and splits all incoming data into sub geodes after the load factor is breached.
+* For example, all data in a geode tracking 9x goes into the sub geode 9xt and eventually the load factor of 9x is breached. Now if data from 9xj is put into the 9x geode, the algorithm will still split 9xj into its own subgeode even though 9xj is not dense. 
+* Not yet recursive, but likely that this solution can be implemented recursively easily.
+
 
 ## Task 3: OpenStreetMap Data
 

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #define TEST_PRECISION 30
+#define TEST_HASH_SZ 2
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
     long insertions = atol(argv[1]);
     printf("Inserting %ld random points\n", insertions);
 
-    struct geode *g = geode_create("9x", TEST_PRECISION);
+    struct geode *g = geode_create("9x", TEST_PRECISION, TEST_HASH_SZ);
 
     double start = timer_now();
     for (int i = 0; i < insertions; ++i) {

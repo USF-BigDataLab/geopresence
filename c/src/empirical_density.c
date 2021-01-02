@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
     }
 
     char line[128];
-    double start = timer_now();
     while (fgets(line, 128, fp) != NULL) {
         char prefix[TEST_HASH_SZ + 1] = { '\0' };
         memcpy(prefix, line, TEST_HASH_SZ);
@@ -43,9 +42,22 @@ int main(int argc, char *argv[])
         geode_add_geohash(instance, line);
     }
 
-    double end = timer_now();
+	struct geode *g;
+    struct geode *sg;
+    for(g=instances; g != NULL; g=g->hh.next) {
+		const uint64_t estimate = HLL_estimate(g->hll);
+		printf("-----------------------------\n");
+		printf("Hash: %s\nTotal: %lld\nUnique: %llu\n", g->prefix, g->total, estimate);
+        printf("Load factor: %f\n", geode_load_factor(g));
+        for (int i = 0; i < g->num_sgs; i++) {
+            sg = g->sgs[i];
+		    const uint64_t estimate = HLL_estimate(sg->hll);
+            printf("\t-----------------------------\n");
+            printf("\tHash: %s\n\tTotal: %lld\n\tUnique: %llu\n", sg->prefix, sg->total, estimate);
+            printf("\tLoad factor: %f\n", geode_load_factor(sg));
+        }
+    }
 
-    printf("%f\n", end - start);
     fclose(fp);
     return 0;
 }

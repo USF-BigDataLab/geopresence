@@ -1,5 +1,4 @@
 # C Compile Sources #
 *.o
 *.gch
-*.a
 .DS_Store
