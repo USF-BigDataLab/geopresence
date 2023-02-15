@@ -23,7 +23,7 @@ The project implementation will be broken down into several tasks. See the follo
 
 ## Task 1: Loading Data and Creating a Spatial Grid
 
-We can begin with the geohash dataset from the NOAA [North American Mesoscale Forecast System](https://www.ncdc.noaa.gov/data-access/model-data/model-datasets/north-american-mesoscale-forecast-system-nam). This has many points that overlap, since weather is recorded for particular areas across a grid. We will need to:
+We can begin with the geohash dataset from the NOAA [North American Mesoscale Forecast System](https://www.ncei.noaa.gov/products/weather-climate-models/north-american-mesoscale). This has many points that overlap, since weather is recorded for particular areas across a grid. We will need to:
 
 * Estimate the density of data already held for the geohash
 * Search for sub geohash or create it if the low resolution hash is appropriately dense
