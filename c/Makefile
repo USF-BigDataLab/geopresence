@@ -10,7 +10,11 @@ obj/%.o : src/%.c
 	@mkdir -p $(@D)
 	gcc -c ${CFLAGS} -o $@ $<
 
-all : ${PROGS}
+all : libcount.a ${PROGS}
+
+libcount.a:
+	cd ./libcount && make
+	cp libcount/libcount.a .
 
 bench_ins : src/bench_ins.c ${OBJS}
 	gcc ${CFLAGS} -o $@ $^ ./libcount.a
