@@ -34,3 +34,4 @@ empirical_density : src/empirical_density.c ${OBJS}
 
 clean :
 	rm -rf ${PROGS} ${OBJDIR}  libcount.a
+	cd libcount && make clean
