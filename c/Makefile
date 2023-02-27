@@ -33,4 +33,4 @@ empirical_density : src/empirical_density.c ${OBJS}
 	gcc ${CFLAGS} -o $@ $^ ./libcount.a
 
 clean :
-	rm -rf ${PROGS} ${OBJDIR} 
+	rm -rf ${PROGS} ${OBJDIR}  libcount.a
