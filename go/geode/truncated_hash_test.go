@@ -28,3 +28,15 @@ func TestMultiWriteAppends(t *testing.T) {
 		t.Errorf("write did not append, actual: %v, expected: %v", actual, toWrite)
 	}
 }
+
+func TestPartialWriteReturnsFull(t *testing.T) {
+	capacity := 5
+	th := NewTruncatedHash(capacity)
+	expected := []byte{0, 1, 2, 0, 0}
+	toWrite := expected[0:3]
+	th.Write(toWrite)
+	actual := th.Sum(nil)
+	if !bytes.Equal(actual, expected) {
+		t.Errorf("partial write mismatch, actual: %v, expected: %v", actual, expected)
+	}
+}
