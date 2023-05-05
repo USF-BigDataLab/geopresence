@@ -14,8 +14,12 @@ import (
 )
 
 func DefaultConfig() *Config {
+	return DefaultConfigHash(sha1.New)
+}
+
+func DefaultConfigHash(hashCreator func() hash.Hash) *Config {
 	n := &Config{
-		Hash:     sha1.New,
+		Hash:     hashCreator,
 		DialOpts: make([]grpc.DialOption, 0, 5),
 	}
 	// n.HashSize = n.Hash().Size()
