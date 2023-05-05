@@ -1,9 +1,9 @@
-package main
+package geode
 
 // #cgo CFLAGS: -g -Wall -std=c11 -O3 -I${SRCDIR}/../c/src
 // #cgo LDFLAGS: -lm -lstdc++ -lcrypto -L${SRCDIR} -lgeode -lcount -Wl,-rpath=${SRCDIR}
 // #include <stdlib.h>
-// #include "../c/src/geode.h"
+// #include "../../c/src/geode.h"
 import "C"
 
 import (

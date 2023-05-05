@@ -1,4 +1,4 @@
-package geopresence
+package geode
 
 import (
 	"bytes"
