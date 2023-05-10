@@ -19,7 +19,8 @@ import (
 type ServerCfg struct {
 	GeohashUpperBound string // Also chord node id
 	GeohashLowerBound string // Geohashes added below this are ignored
-	Hostname          string // Local host name and listen port
+	ControlHostname   string // Address to listen for system control messages
+	ChordHostname     string // Local host name and listen port
 	CreateNewChord    bool   // True to create a new ring
 	SisterId          string // Existing node Id
 	SisterHostname    string // Existing node name and port, blank for new ring
@@ -31,7 +32,8 @@ func configJson() string {
 	sc := &ServerCfg{
 		GeohashUpperBound: "789bcdef",
 		GeohashLowerBound: "6789bcde",
-		Hostname:          "10.0.0.1:12345",
+		ControlHostname:   "10.0.0.1:12000",
+		ChordHostname:     "10.0.0.1:12345",
 		CreateNewChord:    false,
 		SisterId:          "ab123",
 		SisterHostname:    "10.0.0.2:12345",
@@ -70,7 +72,7 @@ func runGeoserver(sc *ServerCfg) error {
 
 	msgChan := make(chan *messages.MessageHandler)
 	defer close(msgChan)
-	connHandler := NewConnHandler(sc.Hostname, msgChan)
+	connHandler := NewConnHandler(sc.ControlHostname, msgChan)
 	err = connHandler.Open()
 	if err != nil {
 		return err
@@ -147,7 +149,7 @@ func startChord(sc *ServerCfg) (*chord.Node, error) {
 
 	cnf := chord.DefaultConfig()
 	cnf.Id = sc.GeohashUpperBound
-	cnf.Addr = sc.Hostname
+	cnf.Addr = sc.ChordHostname
 	cnf.Hash = func() hash.Hash { return geode.NewTruncatedHash(5) }
 	cnf.Timeout = time.Duration(sc.ChordTimeout) * time.Second
 	cnf.MaxIdle = time.Duration(sc.ChordMaxIdle) * time.Second

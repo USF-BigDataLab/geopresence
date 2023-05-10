@@ -16,8 +16,6 @@ func Start(args []string) error {
 	case "add":
 		return messages.SendAddHashRequest(addr, cmdArgs)
 	default:
-		return fmt.Errorf("unkown operation %s", cmd)
+		return fmt.Errorf("unknown operation %s", cmd)
 	}
-
-	return nil
 }
