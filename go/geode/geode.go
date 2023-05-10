@@ -19,7 +19,7 @@ type LatLon struct {
 
 type queryResult C.struct_query_result
 
-// Ensure memory is freed with *GeoRange.Free()
+// Ensure memory is freed with *GeoRange.Close()
 func NewGeode(baseHash string, precision uint, hashSize uint) *Geode {
 	bh := C.CString(baseHash)
 	defer C.free(unsafe.Pointer(bh))
@@ -28,7 +28,7 @@ func NewGeode(baseHash string, precision uint, hashSize uint) *Geode {
 	return (*Geode)(cgp)
 }
 
-func (gp *Geode) Free() {
+func (gp *Geode) Close() {
 	C.geode_free((*C.struct_geode)(gp))
 }
 
