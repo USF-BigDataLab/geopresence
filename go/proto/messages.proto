@@ -1,0 +1,12 @@
+syntax = "proto3";
+option go_package = "./messages";
+
+message Message {
+    oneof msg_type {
+        AddGeohashRequest add_geohash_request = 1;
+    }
+}
+
+message AddGeohashRequest {
+    repeated string geohashes = 1;
+}
