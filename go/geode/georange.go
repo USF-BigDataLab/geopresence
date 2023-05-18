@@ -1,14 +1,16 @@
 package geode
 
 import (
+	"bytes"
 	"fmt"
 )
 
 type GeoRange struct {
-	geode      *Geode
-	upperBound []byte
-	lowerBound []byte
-	wrapsZero  bool
+	geode       *Geode // Underlying container
+	upperBound  []byte // Inclusive limit
+	lowerBound  []byte // Exclusive limit for accepting geohash
+	wrapsZero   bool   // When lower bound > upper bound
+	isUnbounded bool   // If bounds equal, accepts all geohashes
 }
 
 func NewGeoRange(geode *Geode, upperGeohash string, lowerGeohash string) (*GeoRange, error) {
@@ -36,28 +38,30 @@ func (gr *GeoRange) SetBounds(ub string, lb string) error {
 	}
 	gr.upperBound = ubBytes
 	gr.lowerBound = lbBytes
-	gr.wrapsZero = checkLessThan(ubBytes, lbBytes)
+	lowerUpperComp := bytesComparePadded(gr.lowerBound, gr.upperBound)
+	gr.wrapsZero = false
+	if lowerUpperComp > 0 {
+		gr.wrapsZero = true
+	}
+	gr.isUnbounded = false
+	if lowerUpperComp == 0 {
+		gr.isUnbounded = bytes.Equal(ubBytes, lbBytes)
+	}
 	return nil
 }
 
+// Calls close on geode to release resources
 func (gr *GeoRange) Close() {
 	gr.geode.Close()
 }
 
-func (gr *GeoRange) AddGeohash(geohash string) error {
-	// Future: C library also decodes this, should add C function to take decoded geohash
-	geoBytes, err := GhDecodePadRight(geohash)
-	if err != nil {
-		return err
-	}
-	// Future: Verify compiler inlines function
-	if gr.CheckGeoBytesInRange(geoBytes) {
-		gr.geode.AddGeohash(geohash)
-	}
-	return nil
-}
-
-func (gr *GeoRange) TryAddGeohash(geohash string) (bool, error) {
+// Attempts to decode geohash, then if it is in range, adds to this container
+//
+// Returns:
+//
+//	isAdded: True if geohash was added to the container
+//	err: Non-nil when the geohash cannot decode
+func (gr *GeoRange) TryAddGeohash(geohash string) (isAdded bool, decodes error) {
 	geoBytes, err := GhDecodePadRight(geohash)
 	if err != nil {
 		return false, err
@@ -69,55 +73,52 @@ func (gr *GeoRange) TryAddGeohash(geohash string) (bool, error) {
 	return true, nil
 }
 
-func checkLessThan(left, right []byte) bool {
-	// Bytewise compare left and right
-	isEqual := true
-	for i := 0; i < len(left); i++ {
-		if left[i] > right[i] {
-			return false
-		}
-		if left[i] < right[i] {
-			isEqual = false
-		}
-	}
-	return isEqual
-}
-
 func (gr *GeoRange) CheckGeoBytesInRange(geohash []byte) bool {
 	if len(geohash) == 0 {
 		return false
 	}
-	// Todo: Compare vs lower and upper separately, stopping at first non-equal byte in each
-	// for i := 0; i < len(geohash); i++ {
-	// 	// Check if satisfied either upper or lower precision
-	// 	if (i > len(gr.upperBoundupper)) || (i > len(gr.lowerBound)) {
-	// 		// Error condition, means all are equal through their lengths
-	// 		return true
-	// 	}
-	// 	if gr.wrapsZero {
-	// 		if geohash[i] >= lower[i] || geohash[i] < upper[i] {
-	// 			return true
-	// 		}
-	// 	}
-	// }
+	if gr.isUnbounded {
+		return true
+	}
+	isGtLower := bytesComparePadded(geohash, gr.lowerBound) > 0
+	isLteUpper := bytesComparePadded(geohash, gr.upperBound) <= 0
+	if gr.wrapsZero {
+		// When 0 is wrapped, only need either condition satisfied
+		return isGtLower || isLteUpper
+	} else {
+		return isGtLower && isLteUpper
+	}
+}
 
-	// Check each geohash byte
-	// for i := 0; i < len(geohash); i++ {
-	// 	// Check if satisfied either upper or lower precision
-	// 	if (i > len(upper)) || (i > len(lower)) {
-	// 		return true
-	// 	}
-	// 	if wrapsZero {
-	// 		// Fails if >= upper AND < lower
-	// 		if geohash[i] >= upper[i] && geohash[i] < lower[i] {
-	// 			return false
-	// 		}
-	// 	} else {
-	// 		// Not wrapping zero, fails if >= upper or < lower
-	// 		if geohash[i] >= upper[i] || geohash[i] < lower[i] {
-	// 			return false
-	// 		}
-	// 	}
-	// }
-	return true
+// Ignores right-padded 0s, returns 0 if a == b, -1 if a < b, 1 if a > b.
+func bytesComparePadded(a, b []byte) int {
+	if len(a) == len(b) {
+		return bytes.Compare(a, b)
+	}
+	// Get the overlap and remainder
+	var left, right, rem []byte
+	var onDiff int
+	if len(a) > len(b) {
+		left = a[:len(b)]
+		right = b
+		rem = a[len(b):]
+		onDiff = 1
+	} else {
+		left = a
+		right = b[:len(a)]
+		rem = b[len(a):]
+		onDiff = -1
+	}
+	// If the overlap not equal, it's done
+	cmp := bytes.Compare(left, right)
+	if cmp != 0 {
+		return cmp
+	}
+	// If padding all 0s, return equal
+	for _, ele := range rem {
+		if ele != 0 {
+			return onDiff
+		}
+	}
+	return 0
 }
