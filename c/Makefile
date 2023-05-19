@@ -4,7 +4,7 @@ OBJDIR = obj
 
 OBJS = $(addprefix $(OBJDIR)/, geode.o geohash.o timer.o bitmap_graphics.o rtree.o)
 
-CFLAGS = -g -Wall -std=c11 -O3 -lm -lstdc++ -lcrypto
+CFLAGS = -g -Wall -std=c11 -O3 -lm -lstdc++ -lcrypto -fPIC
 
 obj/%.o : src/%.c
 	@mkdir -p $(@D)
@@ -28,9 +28,11 @@ bench_query : src/bench_query.c ${OBJS}
 bench_rtree : src/bench_rtree.c ${OBJS}
 	gcc ${CFLAGS} -o $@ $^ ./libcount.a
 
-
 empirical_density : src/empirical_density.c ${OBJS}
 	gcc ${CFLAGS} -o $@ $^ ./libcount.a
+
+shared_lib :
+	gcc -shared -o libgeode.so ${OBJS}
 
 clean :
 	rm -rf ${PROGS} ${OBJDIR}  libcount.a
