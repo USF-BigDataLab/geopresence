@@ -151,10 +151,15 @@ func handleAddGeohashRequest(msg *messages.AddGeohashRequest, mh *messages.Messa
 		if isInRange || err != nil {
 			continue
 		}
-		// Valid geohash owned by another node
+		// Valid geohash, outside our range, find who owns key
 		tgtNode, err := cnode.Find(geohash)
 		if err != nil {
 			log.Printf("error finding target for: %s, %s", geohash, err.Error())
+			continue
+		}
+		if tgtNode.GetAddr() == cnode.GetAddr() {
+			// Gap in the ring, node owns key, but has no GeoRange coverage
+			log.Printf("node owns key, but is out of range: %s", geohash)
 			continue
 		}
 		controlName, err := chordNameToControl(tgtNode.GetAddr())
@@ -168,7 +173,7 @@ func handleAddGeohashRequest(msg *messages.AddGeohashRequest, mh *messages.Messa
 			continue
 		}
 	}
-	// Send any update to client?
+	// Future: Feedback to requester
 }
 
 func startChord(sc *ServerCfg) (*chord.Node, error) {
