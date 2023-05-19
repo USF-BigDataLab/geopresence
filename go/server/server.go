@@ -128,6 +128,7 @@ func handleMessages(msgChan chan *messages.MessageHandler, cnode *chord.Node, gr
 }
 
 func handleMessage(mh *messages.MessageHandler, cnode *chord.Node, gr *geode.GeoRange) {
+	defer mh.Close()
 	msg, err := mh.Receive()
 	if err != nil {
 		log.Printf("error receiving message: %s", err)
@@ -136,6 +137,8 @@ func handleMessage(mh *messages.MessageHandler, cnode *chord.Node, gr *geode.Geo
 	switch mt := msg.MsgType.(type) {
 	case *messages.Message_AddGeohashRequest:
 		handleAddGeohashRequest(msg.GetAddGeohashRequest(), mh, cnode, gr)
+	case *messages.Message_PolyqueryRequest:
+		handlePolyqueryRequest(msg.GetPolyqueryRequest(), mh, cnode, gr)
 	case nil:
 		log.Printf("received message with invalid type: %T", mt)
 	default:
@@ -145,7 +148,6 @@ func handleMessage(mh *messages.MessageHandler, cnode *chord.Node, gr *geode.Geo
 
 func handleAddGeohashRequest(msg *messages.AddGeohashRequest, mh *messages.MessageHandler,
 	cnode *chord.Node, gr *geode.GeoRange) {
-	defer mh.Close()
 	for _, geohash := range msg.GetGeohashes() {
 		isInRange, err := gr.TryAddGeohash(geohash)
 		if isInRange || err != nil {
@@ -174,6 +176,28 @@ func handleAddGeohashRequest(msg *messages.AddGeohashRequest, mh *messages.Messa
 		}
 	}
 	// Future: Feedback to requester
+}
+
+func handlePolyqueryRequest(msg *messages.PolyqueryRequest, mh *messages.MessageHandler,
+	cnode *chord.Node, gr *geode.GeoRange) {
+	latitudes := msg.GetLatitudes()
+	longitudes := msg.GetLongitudes()
+	if latitudes == nil || longitudes == nil || len(latitudes) != len(longitudes) {
+		log.Printf("latitudes or longitudes malformed")
+		return
+	}
+	// Build the slice of LatLon
+	points := make([]*geode.LatLon, len(latitudes), len(latitudes))
+	for i := 0; i < len(latitudes); i++ {
+		points[i] = &geode.LatLon{
+			Latitude:  float64(latitudes[i]),
+			Longitude: float64(longitudes[i]),
+		}
+	}
+	// Query geode
+	geoNums := gr.GetGeode().PolygonQuery(points)
+	mh.RespondPolyquery(geoNums)
+	// Future: Calculate and forward to nodes that may be in polygon
 }
 
 func startChord(sc *ServerCfg) (*chord.Node, error) {
