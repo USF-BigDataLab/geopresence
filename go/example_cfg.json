@@ -1,1 +1,1 @@
-{"GeohashUpperBound":"22222222","GeohashLowerBound":"11111111","Hostname":"10.0.0.1:12345","CreateNewChord":false,"SisterId":"ab","SisterHostname":"10.0.0.2:12345","ChordTimeout":5,"ChordMaxIdle":60}
+{"GeohashUpperBound":"22222222","GeohashLowerBound":"11111111","ChordHostname":"10.0.0.1:12345","CreateNewChord":false,"SisterId":"ab","SisterHostname":"10.0.0.2:12345","ChordTimeout":5,"ChordMaxIdle":60}
