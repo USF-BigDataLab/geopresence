@@ -29,7 +29,9 @@
 1. The majority of updates will be printed to STDOUT with any crash-related reports to STDERR
 
 ### Client
+1. Remember to query the control port of the chosen server (1 higher than chord port)
 1. Add geohashes
   - "geohash client add server_hostname geohash1 geohash2..."
 1. Polygon query
   - "geohash client polyq server_hostname lat1 long1 lat2 long2..."
+  - Returns the decimal representation of each geode member
