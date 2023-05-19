@@ -50,6 +50,10 @@ func (gr *GeoRange) SetBounds(ub string, lb string) error {
 	return nil
 }
 
+func (gr *GeoRange) GetGeode() *Geode {
+	return gr.geode
+}
+
 // Calls close on geode to release resources
 func (gr *GeoRange) Close() {
 	gr.geode.Close()

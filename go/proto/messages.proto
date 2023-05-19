@@ -4,9 +4,20 @@ option go_package = "./messages";
 message Message {
     oneof msg_type {
         AddGeohashRequest add_geohash_request = 1;
+        PolyqueryRequest polyquery_request = 2;
+        PolyqueryResponse polyquery_response = 3;
     }
 }
 
 message AddGeohashRequest {
     repeated string geohashes = 1;
+}
+
+message PolyqueryRequest {
+    repeated float latitudes = 1;
+    repeated float longitudes = 2;
+}
+
+message PolyqueryResponse {
+    repeated fixed32 geodes = 1;
 }

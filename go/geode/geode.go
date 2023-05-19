@@ -13,8 +13,8 @@ import (
 type Geode C.struct_geode
 
 type LatLon struct {
-	lat float64
-	lon float64
+	Latitude  float64
+	Longitude float64
 }
 
 type queryResult C.struct_query_result
@@ -46,15 +46,15 @@ func (gp *Geode) PrintStdout() {
 	C.print_geode((*C.struct_geode)(gp))
 }
 
-func (gp *Geode) PolygonQuery(points []LatLon) []uint {
+func (gp *Geode) PolygonQuery(points []*LatLon) []uint32 {
 	n := len(points)
 	// Convert the points to spatial ranges
 	spaRanges := make([]C.struct_spatial_range, n, n)
 	for i, point := range points {
 		// Query only uses lat and long from spatial range structs
 		spaRanges[i] = C.struct_spatial_range{
-			latitude:  C.double(point.lat),
-			longitude: C.double(point.lon)}
+			latitude:  C.double(point.Latitude),
+			longitude: C.double(point.Longitude)}
 	}
 	queryRes := C.polygon_query_geode((*C.struct_geode)(gp), &spaRanges[0], C.int(n))
 	// Do not free the locations since we are using those as the slice data
@@ -62,5 +62,5 @@ func (gp *Geode) PolygonQuery(points []LatLon) []uint {
 	pLocs := unsafe.Pointer(queryRes.locations)
 	// Go 1.17 required
 	// Todo: Check if go garbage collection frees the underlying data
-	return unsafe.Slice((*uint)(pLocs), queryRes.sz)
+	return unsafe.Slice((*uint32)(pLocs), queryRes.sz)
 }

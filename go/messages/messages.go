@@ -1,6 +1,8 @@
 package messages
 
-import "net"
+import (
+	"net"
+)
 
 func SendAddHashRequest(addr string, geohashes []string) error {
 	conn, err := net.Dial("tcp", addr)
@@ -18,4 +20,29 @@ func SendAddHashRequest(addr string, geohashes []string) error {
 	}
 	// Wait for remote terminate or response?
 	return nil
+}
+
+func SendPolyqueryRequest(addr string, latitudes, longitudes []float32) (*Message, error) {
+	conn, err := net.Dial("tcp", addr)
+	if err != nil {
+		return nil, err
+	}
+	msg := &Message{MsgType: &Message_PolyqueryRequest{&PolyqueryRequest{
+		Latitudes:  latitudes,
+		Longitudes: longitudes}},
+	}
+	msgHandler := NewMessageHandler(conn)
+	defer msgHandler.Close()
+	err = msgHandler.Send(msg)
+	if err != nil {
+		return nil, err
+	}
+	return msgHandler.Receive()
+}
+
+func (mh *MessageHandler) RespondPolyquery(geoNums []uint32) {
+	msg := &Message{
+		MsgType: &Message_PolyqueryResponse{&PolyqueryResponse{Geodes: geoNums}},
+	}
+	mh.Send(msg)
 }
