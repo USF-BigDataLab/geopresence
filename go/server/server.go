@@ -90,6 +90,7 @@ func runGeoserver(sc *ServerCfg) error {
 		return err
 	}
 	defer cnode.Stop()
+	log.Printf("Chord node running on %s", sc.ChordHostname)
 
 	controlName, err := chordNameToControl(sc.ChordHostname)
 	if err != nil {
@@ -104,8 +105,9 @@ func runGeoserver(sc *ServerCfg) error {
 		return err
 	}
 	defer connHandler.Close()
+	log.Printf("Control system running on %s", controlName)
 
-	gp := geode.NewGeode(sc.GeohashUpperBound, 8, uint(len(sc.GeohashUpperBound)))
+	gp := geode.NewGeode(sc.GeohashUpperBound, 16, uint(len(sc.GeohashUpperBound)))
 	geoRange, err := geode.NewGeoRange(gp, sc.GeohashUpperBound, sc.GeohashLowerBound)
 	if err != nil {
 		return err
@@ -148,12 +150,19 @@ func handleMessage(mh *messages.MessageHandler, cnode *chord.Node, gr *geode.Geo
 
 func handleAddGeohashRequest(msg *messages.AddGeohashRequest, mh *messages.MessageHandler,
 	cnode *chord.Node, gr *geode.GeoRange) {
+	log.Printf("Received add geohash request")
 	for _, geohash := range msg.GetGeohashes() {
 		isInRange, err := gr.TryAddGeohash(geohash)
-		if isInRange || err != nil {
+		if err != nil {
+			log.Printf("error trying add geohash %s: %s", geohash, err.Error())
+			continue
+		}
+		if isInRange {
+			log.Printf("succsefully added %s", geohash)
 			continue
 		}
 		// Valid geohash, outside our range, find who owns key
+		log.Printf("geohash outside range, finding chord owner")
 		tgtNode, err := cnode.Find(geohash)
 		if err != nil {
 			log.Printf("error finding target for: %s, %s", geohash, err.Error())
@@ -169,6 +178,7 @@ func handleAddGeohashRequest(msg *messages.AddGeohashRequest, mh *messages.Messa
 			log.Printf("error converting chord to control name: %s", err.Error())
 			continue
 		}
+		log.Printf("forwarding to key owner: %s", controlName)
 		err = messages.SendAddHashRequest(controlName, []string{geohash})
 		if err != nil {
 			log.Printf("error forwarding hash request: %s", err)
@@ -180,6 +190,7 @@ func handleAddGeohashRequest(msg *messages.AddGeohashRequest, mh *messages.Messa
 
 func handlePolyqueryRequest(msg *messages.PolyqueryRequest, mh *messages.MessageHandler,
 	cnode *chord.Node, gr *geode.GeoRange) {
+	log.Printf("Received polygon query request")
 	latitudes := msg.GetLatitudes()
 	longitudes := msg.GetLongitudes()
 	if latitudes == nil || longitudes == nil || len(latitudes) != len(longitudes) {
@@ -194,8 +205,10 @@ func handlePolyqueryRequest(msg *messages.PolyqueryRequest, mh *messages.Message
 			Longitude: float64(longitudes[i]),
 		}
 	}
+	log.Printf("Querying on polygon size %v", len(points))
 	// Query geode
 	geoNums := gr.GetGeode().PolygonQuery(points)
+	log.Printf("geoNums: %v", geoNums)
 	mh.RespondPolyquery(geoNums)
 	// Future: Calculate and forward to nodes that may be in polygon
 }

@@ -44,6 +44,7 @@ func runPolyqueryRequest(addr string, latlongs []string) error {
 		latitudes[i] = float32(lat)
 		longitudes[i] = float32(long)
 	}
+	log.Printf("Sending Polyquery Request")
 	response, err := messages.SendPolyqueryRequest(addr, latitudes, longitudes)
 	if err != nil {
 		return fmt.Errorf("when receiving response: %w", err)

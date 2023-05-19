@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"log"
 	"net"
 )
 
@@ -37,6 +38,7 @@ func SendPolyqueryRequest(addr string, latitudes, longitudes []float32) (*Messag
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("PolyqueryRequest sent, awaiting response")
 	return msgHandler.Receive()
 }
 
